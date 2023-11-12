@@ -1,8 +1,9 @@
 export const typeDefs = `#graphql
 	type Query {
-		hello: Test
+		retrieveSound(id: Int!): Sound
 	}
-	type Test {
-		bla: String
+	type Sound {
+		name: String
+		description: String
 	}
 `

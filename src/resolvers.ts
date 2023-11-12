@@ -1,9 +1,7 @@
+import * as soundResolvers from "./resolvers/sound.js"
+
 export const resolvers = {
 	Query: {
-		hello: () => {
-			return {
-				bla: "Hello"
-			}
-		}
+		retrieveSound: soundResolvers.retrieveSound
 	}
 }
