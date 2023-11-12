@@ -2,6 +2,7 @@ import * as soundResolvers from "./resolvers/sound.js"
 
 export const resolvers = {
 	Query: {
-		retrieveSound: soundResolvers.retrieveSound
+		retrieveSound: soundResolvers.retrieveSound,
+		listSounds: soundResolvers.listSounds
 	}
 }
