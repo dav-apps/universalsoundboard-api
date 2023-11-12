@@ -12,13 +12,19 @@
 		"test": "echo \"Error: no test specified\" && exit 1"
 	},
 	"license": "MIT",
+	"dependencies": {
+		"@apollo/server": "^4.9.5",
+		"@graphql-tools/schema": "^10.0.0",
+		"@graphql-tools/utils": "^10.0.8",
+		"axios": "^1.6.1",
+		"cors": "^2.8.5",
+		"express": "^4.18.2",
+		"graphql": "^16.8.1",
+		"nodemon": "^3.0.1"
+	},
 	"devDependencies": {
 		"@types/node": "^20.9.0",
 		"concurrently": "^8.2.2",
 		"typescript": "^5.2.2"
-	},
-	"dependencies": {
-		"express": "^4.18.2",
-		"nodemon": "^3.0.1"
 	}
 }
