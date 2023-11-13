@@ -15,7 +15,7 @@ export async function retrieveSound(
 
 export async function listSounds(
 	parent: any,
-	args: { query: string }
+	args: { query?: string }
 ): Promise<List<Sound>> {
 	let searchResult = await searchSounds(args.query)
 	if (searchResult == null) return null

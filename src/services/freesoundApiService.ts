@@ -24,7 +24,7 @@ export async function getSound(id: number): Promise<{
 	}
 }
 
-export async function searchSounds(query: string): Promise<{
+export async function searchSounds(query?: string): Promise<{
 	count: number
 	results: {
 		id: number
@@ -35,12 +35,13 @@ export async function searchSounds(query: string): Promise<{
 	try {
 		let result = await axios({
 			method: "get",
-			url: `https://freesound.org/apiv2/search/text/?query=${query}`,
+			url: `https://freesound.org/apiv2/search/text`,
 			headers: {
 				Authorization: `Token ${process.env.FREESOUND_API_KEY}`
 			},
 			params: {
-				fields: "id,name,description"
+				fields: "id,name,description",
+				query
 			}
 		})
 
