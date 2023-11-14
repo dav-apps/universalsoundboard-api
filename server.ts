@@ -40,7 +40,13 @@ app.use(
 	"/",
 	cors<cors.CorsRequest>(),
 	express.json({ type: "application/json", limit: "50mb" }),
-	expressMiddleware(server)
+	expressMiddleware(server, {
+		context: async ({ req }) => {
+			return {
+				redis
+			}
+		}
+	})
 )
 
 await new Promise<void>(resolve => httpServer.listen({ port }, resolve))
