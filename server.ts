@@ -6,12 +6,23 @@ import { makeExecutableSchema } from "@graphql-tools/schema"
 import express from "express"
 import http from "http"
 import cors from "cors"
+import { createClient } from "redis"
 import { typeDefs } from "./src/typeDefs.js"
 import { resolvers } from "./src/resolvers.js"
 
-const port = process.env.PORT || 4002
+const port = process.env.PORT || 4003
 const app = express()
 const httpServer = http.createServer(app)
+
+//#region Redis config
+export const redis = createClient({
+	url: process.env.REDIS_URL,
+	database: process.env.ENVIRONMENT == "production" ? 7 : 6 // production: 7, staging: 6
+})
+
+redis.on("error", err => console.log("Redis Client Error", err))
+await redis.connect()
+//#endregion
 
 let schema = makeExecutableSchema({
 	typeDefs,
