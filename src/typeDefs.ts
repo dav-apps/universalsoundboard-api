@@ -7,6 +7,7 @@ export const typeDefs = `#graphql
 	type Sound {
 		name: String
 		description: String
+		audioFileUrl: String
 	}
 
 	type SoundList {

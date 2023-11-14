@@ -9,7 +9,8 @@ export async function retrieveSound(
 
 	return {
 		name: sound.name,
-		description: sound.description
+		description: sound.description,
+		audioFileUrl: sound.previews["preview-lq-mp3"]
 	}
 }
 
@@ -20,8 +21,18 @@ export async function listSounds(
 	let searchResult = await searchSounds(args.query)
 	if (searchResult == null) return null
 
+	let items: Sound[] = []
+
+	for (let item of searchResult.results) {
+		items.push({
+			name: item.name,
+			description: item.description,
+			audioFileUrl: item.previews["preview-lq-mp3"]
+		})
+	}
+
 	return {
 		total: searchResult.count,
-		items: searchResult.results
+		items
 	}
 }

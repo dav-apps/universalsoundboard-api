@@ -12,4 +12,5 @@ export interface List<T> {
 export interface Sound {
 	name: string
 	description: string
+	audioFileUrl: string
 }

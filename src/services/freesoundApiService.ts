@@ -4,6 +4,9 @@ export async function getSound(id: number): Promise<{
 	id: number
 	name: string
 	description: string
+	previews: {
+		"preview-lq-mp3": string
+	}
 }> {
 	try {
 		let result = await axios({
@@ -13,7 +16,7 @@ export async function getSound(id: number): Promise<{
 				Authorization: `Token ${process.env.FREESOUND_API_KEY}`
 			},
 			params: {
-				fields: "id,name,description"
+				fields: "id,name,description,previews"
 			}
 		})
 
@@ -30,6 +33,9 @@ export async function searchSounds(query?: string): Promise<{
 		id: number
 		name: string
 		description: string
+		previews: {
+			"preview-lq-mp3": string
+		}
 	}[]
 }> {
 	try {
@@ -40,7 +46,7 @@ export async function searchSounds(query?: string): Promise<{
 				Authorization: `Token ${process.env.FREESOUND_API_KEY}`
 			},
 			params: {
-				fields: "id,name,description",
+				fields: "id,name,description,previews",
 				query
 			}
 		})
