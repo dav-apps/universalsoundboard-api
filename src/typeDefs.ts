@@ -8,6 +8,7 @@ export const typeDefs = `#graphql
 		name: String
 		description: String
 		audioFileUrl: String
+		source: String
 	}
 
 	type SoundList {

@@ -10,7 +10,8 @@ export async function retrieveSound(
 	return {
 		name: sound.name,
 		description: sound.description,
-		audioFileUrl: sound.previews["preview-lq-mp3"]
+		audioFileUrl: sound.previews["preview-lq-mp3"],
+		source: sound.url
 	}
 }
 
@@ -27,7 +28,8 @@ export async function listSounds(
 		items.push({
 			name: item.name,
 			description: item.description,
-			audioFileUrl: item.previews["preview-lq-mp3"]
+			audioFileUrl: item.previews["preview-lq-mp3"],
+			source: item.url
 		})
 	}
 

@@ -2,6 +2,7 @@ import axios from "axios"
 
 export async function getSound(id: number): Promise<{
 	id: number
+	url: string
 	name: string
 	description: string
 	previews: {
@@ -16,7 +17,7 @@ export async function getSound(id: number): Promise<{
 				Authorization: `Token ${process.env.FREESOUND_API_KEY}`
 			},
 			params: {
-				fields: "id,name,description,previews"
+				fields: "id,url,name,description,previews"
 			}
 		})
 
@@ -31,6 +32,7 @@ export async function searchSounds(query?: string): Promise<{
 	count: number
 	results: {
 		id: number
+		url: string
 		name: string
 		description: string
 		previews: {
@@ -46,7 +48,7 @@ export async function searchSounds(query?: string): Promise<{
 				Authorization: `Token ${process.env.FREESOUND_API_KEY}`
 			},
 			params: {
-				fields: "id,name,description,previews",
+				fields: "id,url,name,description,previews",
 				query
 			}
 		})
