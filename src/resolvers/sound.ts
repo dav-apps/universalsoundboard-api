@@ -18,9 +18,12 @@ export async function retrieveSound(
 
 export async function listSounds(
 	parent: any,
-	args: { query?: string }
+	args: { query?: string; limit?: number }
 ): Promise<List<Sound>> {
-	let searchResult = await searchSounds(args.query)
+	let searchResult = await searchSounds({
+		query: args.query,
+		limit: args.limit
+	})
 	if (searchResult == null) return null
 
 	let items: Sound[] = []
