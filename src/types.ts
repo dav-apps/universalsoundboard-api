@@ -13,5 +13,6 @@ export interface Sound {
 	name: string
 	description: string
 	audioFileUrl: string
+	type: string
 	source: string
 }
