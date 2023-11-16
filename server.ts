@@ -10,6 +10,7 @@ import { PrismaClient } from "@prisma/client"
 import { createClient } from "redis"
 import { typeDefs } from "./src/typeDefs.js"
 import { resolvers } from "./src/resolvers.js"
+import { setup as soundSetup } from "./src/endpoints/sound.js"
 
 const port = process.env.PORT || 4003
 const app = express()
@@ -38,6 +39,9 @@ const server = new ApolloServer({
 })
 
 await server.start()
+
+// Call setup functions of each endpoint file
+soundSetup(app)
 
 app.use(
 	"/",
