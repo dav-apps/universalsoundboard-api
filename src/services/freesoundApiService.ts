@@ -31,7 +31,8 @@ export async function getSound(id: number): Promise<{
 
 export async function searchSounds(params?: {
 	query?: string
-	limit?: number
+	page?: number
+	pageSize?: number
 }): Promise<{
 	count: number
 	results: {
@@ -56,7 +57,8 @@ export async function searchSounds(params?: {
 				fields: "id,url,name,description,type,previews",
 				query: params.query,
 				sort: "created_desc",
-				page_size: params.limit ?? 10
+				page: params.page ?? 1,
+				page_size: params.pageSize ?? 10
 			}
 		})
 
