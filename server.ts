@@ -8,6 +8,10 @@ import cors from "cors"
 import { PrismaClient } from "@prisma/client"
 import { createClient } from "redis"
 import { Dav, Environment, isSuccessStatusCode } from "dav-js"
+import { User } from "./src/types.js"
+import { throwApiError } from "./src/utils.js"
+import { apiErrors } from "./src/errors.js"
+import { getUser } from "./src/services/apiService.js"
 import { typeDefs } from "./src/typeDefs.js"
 import { resolvers } from "./src/resolvers.js"
 import { setup as soundSetup } from "./src/endpoints/sound.js"
@@ -66,9 +70,28 @@ app.use(
 	express.json({ type: "application/json", limit: "50mb" }),
 	expressMiddleware(server, {
 		context: async ({ req }) => {
+			const accessToken = req.headers.authorization
+			let user: User = null
+
+			if (accessToken != null) {
+				let userResponse = await getUser(accessToken)
+
+				if (isSuccessStatusCode(userResponse.status)) {
+					user = userResponse.data
+				} else if (
+					userResponse.errors != null &&
+					userResponse.errors.length > 0 &&
+					userResponse.errors[0].code == 3101
+				) {
+					throwApiError(apiErrors.sessionEnded)
+				}
+			}
+
 			return {
 				prisma,
-				redis
+				redis,
+				accessToken,
+				user
 			}
 		}
 	})
