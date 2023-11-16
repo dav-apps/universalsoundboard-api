@@ -1,6 +1,8 @@
+import { PrismaClient } from "@prisma/client"
 import { RedisClientType } from "redis"
 
 export interface ResolverContext {
+	prisma: PrismaClient
 	redis: RedisClientType
 }
 

@@ -6,6 +6,7 @@ import { makeExecutableSchema } from "@graphql-tools/schema"
 import express from "express"
 import http from "http"
 import cors from "cors"
+import { PrismaClient } from "@prisma/client"
 import { createClient } from "redis"
 import { typeDefs } from "./src/typeDefs.js"
 import { resolvers } from "./src/resolvers.js"
@@ -13,6 +14,8 @@ import { resolvers } from "./src/resolvers.js"
 const port = process.env.PORT || 4003
 const app = express()
 const httpServer = http.createServer(app)
+
+export const prisma = new PrismaClient()
 
 //#region Redis config
 export const redis = createClient({
@@ -43,6 +46,7 @@ app.use(
 	expressMiddleware(server, {
 		context: async ({ req }) => {
 			return {
+				prisma,
 				redis
 			}
 		}
