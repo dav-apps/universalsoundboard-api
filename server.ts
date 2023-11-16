@@ -1,4 +1,3 @@
-import "dotenv/config"
 import { ApolloServer } from "@apollo/server"
 import { expressMiddleware } from "@apollo/server/express4"
 import { ApolloServerPluginDrainHttpServer } from "@apollo/server/plugin/drainHttpServer"
@@ -8,6 +7,7 @@ import http from "http"
 import cors from "cors"
 import { PrismaClient } from "@prisma/client"
 import { createClient } from "redis"
+import { Dav, Environment, isSuccessStatusCode } from "dav-js"
 import { typeDefs } from "./src/typeDefs.js"
 import { resolvers } from "./src/resolvers.js"
 import { setup as soundSetup } from "./src/endpoints/sound.js"
@@ -39,6 +39,23 @@ const server = new ApolloServer({
 })
 
 await server.start()
+
+// Init dav
+let environment = Environment.Development
+
+switch (process.env.ENVIRONMENT) {
+	case "production":
+		environment = Environment.Production
+		break
+	case "staging":
+		environment = Environment.Staging
+		break
+}
+
+new Dav({
+	environment,
+	server: true
+})
 
 // Call setup functions of each endpoint file
 soundSetup(app)
