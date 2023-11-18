@@ -8,6 +8,10 @@ export const typeDefs = `#graphql
 		): SoundList
 	}
 
+	type Mutation {
+		createSound(name: String!): Sound
+	}
+
 	type Sound {
 		name: String
 		description: String

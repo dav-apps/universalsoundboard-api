@@ -3,6 +3,10 @@ import {
 	getSound,
 	searchSounds
 } from "../services/freesoundApiService.js"
+import { List, ResolverContext, Sound } from "../types.js"
+import { throwApiError, throwValidationError, randomNumber } from "../utils.js"
+import { apiErrors } from "../errors.js"
+import { validateNameLength } from "../services/validationService.js"
 
 export async function retrieveSound(
 	parent: any,
@@ -83,5 +87,35 @@ export async function listSounds(
 			total: searchResult.count,
 			items
 		}
+	}
+}
+
+export async function createSound(
+	parent: any,
+	args: { name: string },
+	context: ResolverContext
+): Promise<Sound> {
+	const user = context.user
+
+	// Check if the user is logged in
+	if (user == null) {
+		throwApiError(apiErrors.notAuthenticated)
+	}
+
+	// Validate the args
+	throwValidationError(validateNameLength(args.name))
+
+	// Create the sound
+	let sound = await context.prisma.sound.create({
+		data: {
+			uuid: crypto.randomUUID(),
+			name: args.name
+		}
+	})
+
+	return {
+		...sound,
+		audioFileUrl: null,
+		source: null
 	}
 }
