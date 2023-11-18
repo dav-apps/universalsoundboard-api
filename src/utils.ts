@@ -75,6 +75,10 @@ export async function generateUuidForFreesoundItem(id: number) {
 	return `freesound:${id}`
 }
 
+export function getTableObjectFileUrl(uuid: string) {
+	return `https://dav-backend.fra1.cdn.digitaloceanspaces.com/${uuid}`
+}
+
 export function randomNumber(min: number, max: number) {
 	return Math.floor(Math.random() * (max - min + 1)) + min
 }

@@ -6,6 +6,7 @@ import {
 	throwApiError,
 	throwValidationError,
 	generateUuidForFreesoundItem,
+	getTableObjectFileUrl,
 	randomNumber
 } from "../utils.js"
 import { storeSoundTableId } from "../constants.js"
@@ -32,18 +33,53 @@ export async function retrieveSound(
 
 export async function listSounds(
 	parent: any,
-	args: { query?: string; random?: boolean; limit?: number }
+	args: {
+		mine?: boolean
+		random?: boolean
+		query?: string
+		limit?: number
+		offset?: number
+	},
+	context: ResolverContext
 ): Promise<List<Sound>> {
-	if (args.random) {
-		let limit = args.limit ?? 10
+	let take = args.limit ?? 10
+	if (take <= 0) take = 10
+
+	let skip = args.offset ?? 0
+	if (skip < 0) skip = 0
+
+	if (args.mine && context.user != null) {
+		let where = { userId: context.user.id }
+
+		const [total, items] = await context.prisma.$transaction([
+			context.prisma.sound.count({ where }),
+			context.prisma.sound.findMany({ where })
+		])
+
+		let soundItems: Sound[] = []
+
+		for (let item of items) {
+			soundItems.push({
+				...item,
+				audioFileUrl:
+					item.type != null ? getTableObjectFileUrl(item.uuid) : null,
+				source: null
+			})
+		}
+
+		return {
+			total,
+			items: soundItems
+		}
+	} else if (args.random) {
 		let initialSearchResult = await searchSounds({ pageSize: 1 })
 		let totalItems = initialSearchResult.count
-		let pages = Math.floor(totalItems / limit)
+		let pages = Math.floor(totalItems / take)
 		let index = randomNumber(1, pages)
 
 		let searchResult = await searchSounds({
 			page: index,
-			pageSize: limit
+			pageSize: take
 		})
 
 		let items: Sound[] = []
@@ -68,7 +104,7 @@ export async function listSounds(
 	} else {
 		let searchResult = await searchSounds({
 			query: args.query,
-			pageSize: args.limit
+			pageSize: take
 		})
 		if (searchResult == null) return null
 

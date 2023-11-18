@@ -2,9 +2,11 @@ export const typeDefs = `#graphql
 	type Query {
 		retrieveSound(id: Int!): Sound
 		listSounds(
-			query: String
+			mine: Boolean
 			random: Boolean
+			query: String
 			limit: Int
+			offset: Int
 		): SoundList
 	}
 
