@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client"
+import { PrismaClient, Sound as SoundModel } from "@prisma/client"
 import { RedisClientType } from "redis"
 
 export interface ResolverContext {
@@ -11,14 +11,6 @@ export interface ResolverContext {
 export interface List<T> {
 	total: number
 	items: T[]
-}
-
-export interface Sound {
-	name: string
-	description: string
-	audioFileUrl: string
-	type: string
-	source: string
 }
 
 export interface ApiError {
@@ -46,5 +38,13 @@ export interface User {
 	provider: boolean
 	profileImage: string
 	profileImageEtag: string
+}
+//#endregion
+
+//#region UniversalSoundboard models
+export interface Sound extends SoundModel {
+	audioFileUrl: string
+	type: string
+	source: string
 }
 //#endregion
