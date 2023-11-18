@@ -21,6 +21,7 @@ export async function retrieveSound(
 	return {
 		id: null,
 		uuid: await generateUuidForFreesoundItem(sound.id),
+		userId: BigInt(0),
 		name: sound.name,
 		description: sound.description,
 		audioFileUrl: sound.previews["preview-hq-mp3"],
@@ -52,6 +53,7 @@ export async function listSounds(
 			items.push({
 				id: BigInt(item.id),
 				uuid: await generateUuidForFreesoundItem(item.id),
+				userId: BigInt(0),
 				name: item.name,
 				description: item.description,
 				audioFileUrl: item.previews["preview-hq-mp3"],
@@ -78,6 +80,7 @@ export async function listSounds(
 			items.push({
 				id: BigInt(item.id),
 				uuid: await generateUuidForFreesoundItem(item.id),
+				userId: BigInt(0),
 				name: item.name,
 				description: item.description,
 				audioFileUrl: item.previews["preview-hq-mp3"],
@@ -115,6 +118,7 @@ export async function createSound(
 	let sound = await context.prisma.sound.create({
 		data: {
 			uuid,
+			userId: user.id,
 			name: args.name
 		}
 	})
