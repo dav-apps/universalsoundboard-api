@@ -26,8 +26,7 @@ export async function retrieveSound(
 		description: sound.description,
 		audioFileUrl: sound.previews["preview-hq-mp3"],
 		type: sound.type,
-		source: sound.url,
-		status: "published"
+		source: sound.url
 	}
 }
 
@@ -58,8 +57,7 @@ export async function listSounds(
 				description: item.description,
 				audioFileUrl: item.previews["preview-hq-mp3"],
 				type: item.type,
-				source: item.url,
-				status: "published"
+				source: item.url
 			})
 		}
 
@@ -85,8 +83,7 @@ export async function listSounds(
 				description: item.description,
 				audioFileUrl: item.previews["preview-hq-mp3"],
 				type: item.type,
-				source: item.url,
-				status: "published"
+				source: item.url
 			})
 		}
 

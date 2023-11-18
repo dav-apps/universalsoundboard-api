@@ -17,5 +17,4 @@ model Sound {
   name        String  @db.VarChar
   description String? @db.VarChar
   type        String? @db.VarChar
-  status      String  @default("unpublished") @db.VarChar
 }
