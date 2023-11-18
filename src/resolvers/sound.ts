@@ -1,10 +1,14 @@
-import {
-	generateUuidForFreesoundItem,
-	getSound,
-	searchSounds
-} from "../services/freesoundApiService.js"
+import * as crypto from "crypto"
+import { isSuccessStatusCode, TableObjectsController } from "dav-js"
+import { getSound, searchSounds } from "../services/freesoundApiService.js"
 import { List, ResolverContext, Sound } from "../types.js"
-import { throwApiError, throwValidationError, randomNumber } from "../utils.js"
+import {
+	throwApiError,
+	throwValidationError,
+	generateUuidForFreesoundItem,
+	randomNumber
+} from "../utils.js"
+import { storeSoundTableId } from "../constants.js"
 import { apiErrors } from "../errors.js"
 import { validateNameLength } from "../services/validationService.js"
 
@@ -106,12 +110,26 @@ export async function createSound(
 	throwValidationError(validateNameLength(args.name))
 
 	// Create the sound
+	let uuid = crypto.randomUUID()
+
 	let sound = await context.prisma.sound.create({
 		data: {
-			uuid: crypto.randomUUID(),
+			uuid,
 			name: args.name
 		}
 	})
+
+	// Create the sound table object
+	let createSoundResponse = await TableObjectsController.CreateTableObject({
+		accessToken: context.accessToken,
+		uuid,
+		tableId: storeSoundTableId,
+		file: true
+	})
+
+	if (!isSuccessStatusCode(createSoundResponse.status)) {
+		throwApiError(apiErrors.unexpectedError)
+	}
 
 	return {
 		...sound,

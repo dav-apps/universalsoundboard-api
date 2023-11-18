@@ -27,6 +27,11 @@ export const apiErrors = {
 		code: "SESSION_ENDED",
 		message: "Session has ended and must be renewed",
 		status: 403
+	},
+	soundNotExists: {
+		code: "SOUND_NOT_EXISTS",
+		message: "Sound does not exist",
+		status: 404
 	}
 }
 
