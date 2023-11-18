@@ -1,6 +1,8 @@
-import { getSound, searchSounds } from "../services/freesoundApiService.js"
-import { List, Sound } from "../types.js"
-import { randomNumber } from "../utils.js"
+import {
+	generateUuidForFreesoundItem,
+	getSound,
+	searchSounds
+} from "../services/freesoundApiService.js"
 
 export async function retrieveSound(
 	parent: any,
@@ -9,11 +11,14 @@ export async function retrieveSound(
 	let sound = await getSound(args.id)
 
 	return {
+		id: null,
+		uuid: await generateUuidForFreesoundItem(sound.id),
 		name: sound.name,
 		description: sound.description,
 		audioFileUrl: sound.previews["preview-hq-mp3"],
 		type: sound.type,
-		source: sound.url
+		source: sound.url,
+		status: "published"
 	}
 }
 
@@ -37,11 +42,14 @@ export async function listSounds(
 
 		for (let item of searchResult.results) {
 			items.push({
+				id: BigInt(item.id),
+				uuid: await generateUuidForFreesoundItem(item.id),
 				name: item.name,
 				description: item.description,
 				audioFileUrl: item.previews["preview-hq-mp3"],
 				type: item.type,
-				source: item.url
+				source: item.url,
+				status: "published"
 			})
 		}
 
@@ -60,11 +68,14 @@ export async function listSounds(
 
 		for (let item of searchResult.results) {
 			items.push({
+				id: BigInt(item.id),
+				uuid: await generateUuidForFreesoundItem(item.id),
 				name: item.name,
 				description: item.description,
 				audioFileUrl: item.previews["preview-hq-mp3"],
 				type: item.type,
-				source: item.url
+				source: item.url,
+				status: "published"
 			})
 		}
 

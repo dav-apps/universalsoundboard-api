@@ -1,5 +1,9 @@
 import axios from "axios"
 
+export async function generateUuidForFreesoundItem(id: number) {
+	return `freesound:${id}`
+}
+
 export async function getSound(id: number): Promise<{
 	id: number
 	url: string
