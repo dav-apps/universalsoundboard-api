@@ -51,6 +51,45 @@ function sendEndpointError(res: Response, error: ApiError) {
 	})
 }
 
+export async function getUserForEndpoint(accessToken: string): Promise<User> {
+	if (accessToken == null) {
+		return null
+	}
+
+	let userResponse = await getUser(accessToken)
+
+	if (isSuccessStatusCode(userResponse.status)) {
+		return userResponse.data
+	} else if (
+		userResponse.errors != null &&
+		userResponse.errors.length > 0 &&
+		userResponse.errors[0].code == 3101
+	) {
+		throwEndpointError(apiErrors.sessionEnded)
+	}
+
+	return null
+}
+
+export async function generateUuidForFreesoundItem(id: number) {
+	return `freesound:${id}`
+}
+
 export function randomNumber(min: number, max: number) {
 	return Math.floor(Math.random() * (max - min + 1)) + min
+}
+
+export function getFileExtensionByContentType(contentType: string): string {
+	switch (contentType) {
+		case "audio/mpeg":
+			return "mp3"
+		case "audio/mp4":
+			return "mp4"
+		case "audio/wav":
+			return "wav"
+		case "audio/ogg":
+			return "ogg"
+		default:
+			return null
+	}
 }
