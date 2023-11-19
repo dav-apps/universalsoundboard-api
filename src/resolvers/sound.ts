@@ -1,7 +1,7 @@
 import * as crypto from "crypto"
 import { isSuccessStatusCode, TableObjectsController } from "dav-js"
 import { getSound, searchSounds } from "../services/freesoundApiService.js"
-import { List, ResolverContext, Sound } from "../types.js"
+import { ResolverContext, QueryResult, List, Sound } from "../types.js"
 import {
 	throwApiError,
 	throwValidationError,
@@ -16,18 +16,21 @@ import { validateNameLength } from "../services/validationService.js"
 export async function retrieveSound(
 	parent: any,
 	args: { id: number }
-): Promise<Sound> {
+): Promise<QueryResult<Sound>> {
 	let sound = await getSound(args.id)
 
 	return {
-		id: null,
-		uuid: await generateUuidForFreesoundItem(sound.id),
-		userId: BigInt(0),
-		name: sound.name,
-		description: sound.description,
-		audioFileUrl: sound.previews["preview-hq-mp3"],
-		type: sound.type,
-		source: sound.url
+		caching: true,
+		data: {
+			id: null,
+			uuid: await generateUuidForFreesoundItem(sound.id),
+			userId: BigInt(0),
+			name: sound.name,
+			description: sound.description,
+			audioFileUrl: sound.previews["preview-hq-mp3"],
+			type: sound.type,
+			source: sound.url
+		}
 	}
 }
 
@@ -41,7 +44,7 @@ export async function listSounds(
 		offset?: number
 	},
 	context: ResolverContext
-): Promise<List<Sound>> {
+): Promise<QueryResult<List<Sound>>> {
 	let take = args.limit ?? 10
 	if (take <= 0) take = 10
 
@@ -68,8 +71,11 @@ export async function listSounds(
 		}
 
 		return {
-			total,
-			items: soundItems
+			caching: false,
+			data: {
+				total,
+				items: soundItems
+			}
 		}
 	} else if (args.random) {
 		let initialSearchResult = await searchSounds({ pageSize: 1 })
@@ -98,8 +104,11 @@ export async function listSounds(
 		}
 
 		return {
-			total: totalItems,
-			items
+			caching: true,
+			data: {
+				total: totalItems,
+				items
+			}
 		}
 	} else {
 		let searchResult = await searchSounds({
@@ -124,8 +133,11 @@ export async function listSounds(
 		}
 
 		return {
-			total: searchResult.count,
-			items
+			caching: true,
+			data: {
+				total: searchResult.count,
+				items
+			}
 		}
 	}
 }

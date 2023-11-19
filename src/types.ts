@@ -8,6 +8,11 @@ export interface ResolverContext {
 	user?: User
 }
 
+export interface QueryResult<T> {
+	caching: boolean
+	data: T
+}
+
 export interface List<T> {
 	total: number
 	items: T[]
