@@ -11,10 +11,14 @@ export const typeDefs = `#graphql
 	}
 
 	type Mutation {
-		createSound(name: String!): Sound
+		createSound(
+			name: String!
+			description: String
+		): Sound
 	}
 
 	type Sound {
+		uuid: String
 		name: String
 		description: String
 		audioFileUrl: String

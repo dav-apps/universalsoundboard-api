@@ -21,4 +21,10 @@ export function validateNameLength(name: string) {
 		return validationErrors.nameTooLong
 	}
 }
+
+export function validateDescriptionLength(description: string) {
+	if (description.length > 5000) {
+		return validationErrors.descriptionTooLong
+	}
+}
 //#endregion

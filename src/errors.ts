@@ -37,5 +37,6 @@ export const apiErrors = {
 
 export const validationErrors = {
 	nameTooShort: "NAME_TOO_SHORT",
-	nameTooLong: "NAME_TOO_LONG"
+	nameTooLong: "NAME_TOO_LONG",
+	descriptionTooLong: "DESCRIPTION_TOO_LONG"
 }

@@ -11,7 +11,10 @@ import {
 } from "../utils.js"
 import { storeSoundTableId } from "../constants.js"
 import { apiErrors } from "../errors.js"
-import { validateNameLength } from "../services/validationService.js"
+import {
+	validateDescriptionLength,
+	validateNameLength
+} from "../services/validationService.js"
 
 export async function retrieveSound(
 	parent: any,
@@ -144,7 +147,7 @@ export async function listSounds(
 
 export async function createSound(
 	parent: any,
-	args: { name: string },
+	args: { name: string; description?: string },
 	context: ResolverContext
 ): Promise<Sound> {
 	const user = context.user
@@ -157,6 +160,10 @@ export async function createSound(
 	// Validate the args
 	throwValidationError(validateNameLength(args.name))
 
+	if (args.description != null) {
+		throwValidationError(validateDescriptionLength(args.description))
+	}
+
 	// Create the sound
 	let uuid = crypto.randomUUID()
 
@@ -164,7 +171,8 @@ export async function createSound(
 		data: {
 			uuid,
 			userId: user.id,
-			name: args.name
+			name: args.name,
+			description: args.description
 		}
 	})
 
