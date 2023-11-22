@@ -63,6 +63,7 @@ export async function listSounds(
 	parent: any,
 	args: {
 		mine?: boolean
+		userId?: number
 		random?: boolean
 		query?: string
 		limit?: number
@@ -76,8 +77,14 @@ export async function listSounds(
 	let skip = args.offset ?? 0
 	if (skip < 0) skip = 0
 
-	if (args.mine && context.user != null) {
+	let mine = args.mine && context.user != null
+
+	if (mine || args.userId) {
 		let where = { userId: context.user.id }
+
+		if (args.userId) {
+			where.userId = args.userId
+		}
 
 		const [total, items] = await context.prisma.$transaction([
 			context.prisma.sound.count({ where }),

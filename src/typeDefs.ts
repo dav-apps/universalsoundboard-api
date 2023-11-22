@@ -3,6 +3,7 @@ export const typeDefs = `#graphql
 		retrieveSound(uuid: String!): Sound
 		listSounds(
 			mine: Boolean
+			userId: Int
 			random: Boolean
 			query: String
 			limit: Int
