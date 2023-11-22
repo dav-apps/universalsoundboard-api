@@ -27,5 +27,9 @@ export const resolvers = {
 	},
 	Mutation: {
 		createSound: soundResolvers.createSound
+	},
+	Sound: {
+		user: (parent: any, args: any, context: ResolverContext, info: any) =>
+			cachingResolver(parent, args, context, info, soundResolvers.user)
 	}
 }

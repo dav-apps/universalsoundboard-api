@@ -1,7 +1,8 @@
 import * as crypto from "crypto"
 import { isSuccessStatusCode, TableObjectsController } from "dav-js"
+import { getUserById } from "../services/apiService.js"
 import { getSound, searchSounds } from "../services/freesoundApiService.js"
-import { ResolverContext, QueryResult, List, Sound } from "../types.js"
+import { ResolverContext, QueryResult, List, User, Sound } from "../types.js"
 import {
 	throwApiError,
 	throwValidationError,
@@ -192,5 +193,33 @@ export async function createSound(
 		...sound,
 		audioFileUrl: null,
 		source: null
+	}
+}
+
+export async function user(
+	sound: Sound,
+	args: any,
+	context: ResolverContext
+): Promise<QueryResult<User>> {
+	if (sound.userId == BigInt(0)) {
+		return {
+			caching: true,
+			data: null
+		}
+	}
+
+	// Get the user from the API
+	let response = await getUserById(Number(sound.userId))
+
+	if (isSuccessStatusCode(response.status)) {
+		return {
+			caching: true,
+			data: response.data
+		}
+	}
+
+	return {
+		caching: true,
+		data: null
 	}
 }

@@ -17,9 +17,16 @@ export const typeDefs = `#graphql
 		): Sound
 	}
 
+	type User {
+		id: Int!
+		firstName: String!
+		profileImage: String!
+	}
+
 	type Sound {
-		uuid: String
-		name: String
+		uuid: String!
+		user: User
+		name: String!
 		description: String
 		audioFileUrl: String
 		type: String
