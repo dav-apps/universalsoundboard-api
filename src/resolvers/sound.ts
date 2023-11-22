@@ -19,21 +19,42 @@ import {
 
 export async function retrieveSound(
 	parent: any,
-	args: { id: number }
+	args: { uuid: string },
+	context: ResolverContext
 ): Promise<QueryResult<Sound>> {
-	let sound = await getSound(args.id)
+	// Check the source of the sound
+	if (args.uuid.startsWith("freesound")) {
+		// Get the freesound id from the uuid
+		let freesoundId = +args.uuid.split(":")[1]
+		let sound = await getSound(freesoundId)
 
-	return {
-		caching: true,
-		data: {
-			id: null,
-			uuid: await generateUuidForFreesoundItem(sound.id),
-			userId: BigInt(0),
-			name: sound.name,
-			description: sound.description,
-			audioFileUrl: sound.previews["preview-hq-mp3"],
-			type: sound.type,
-			source: sound.url
+		return {
+			caching: true,
+			data: {
+				id: null,
+				uuid: await generateUuidForFreesoundItem(sound.id),
+				userId: BigInt(0),
+				name: sound.name,
+				description: sound.description,
+				audioFileUrl: sound.previews["preview-hq-mp3"],
+				type: sound.type,
+				source: sound.url
+			}
+		}
+	} else {
+		// Get the sound from the database
+		let sound = await context.prisma.sound.findFirst({
+			where: { uuid: args.uuid }
+		})
+
+		return {
+			caching: true,
+			data: {
+				...sound,
+				audioFileUrl:
+					sound.type != null ? getTableObjectFileUrl(sound.uuid) : null,
+				source: null
+			}
 		}
 	}
 }
