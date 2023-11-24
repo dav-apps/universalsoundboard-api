@@ -116,6 +116,7 @@ export async function listSounds(
 		let index = randomNumber(1, pages)
 
 		let searchResult = await searchSounds({
+			sort: "created_desc",
 			page: index,
 			pageSize: take
 		})
@@ -144,7 +145,9 @@ export async function listSounds(
 		}
 	} else {
 		let searchResult = await searchSounds({
+			sort: args.query ? null : "created_desc",
 			query: args.query,
+			page: skip > 0 ? Math.floor(skip / take) + 1 : 1,
 			pageSize: take
 		})
 		if (searchResult == null) return null
