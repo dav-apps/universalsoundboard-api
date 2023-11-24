@@ -1,5 +1,6 @@
 export const typeDefs = `#graphql
 	type Query {
+		retrieveUser(id: Int!): User
 		retrieveSound(uuid: String!): Sound
 		listSounds(
 			mine: Boolean
