@@ -88,7 +88,11 @@ export async function listSounds(
 
 		const [total, items] = await context.prisma.$transaction([
 			context.prisma.sound.count({ where }),
-			context.prisma.sound.findMany({ where })
+			context.prisma.sound.findMany({
+				where,
+				take,
+				skip
+			})
 		])
 
 		let soundItems: Sound[] = []
