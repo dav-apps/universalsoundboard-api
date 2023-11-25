@@ -9,7 +9,8 @@ export const typeDefs = `#graphql
 			query: String
 			limit: Int
 			offset: Int
-		): SoundList
+		): SoundList!
+		listTags(limit: Int, offset: Int): TagList!
 	}
 
 	type Mutation {
@@ -38,5 +39,15 @@ export const typeDefs = `#graphql
 	type SoundList {
 		total: Int!
 		items: [Sound!]!
+	}
+
+	type Tag {
+		uuid: String!
+		name: String!
+	}
+
+	type TagList {
+		total: Int!
+		items: [Tag!]!
 	}
 `
