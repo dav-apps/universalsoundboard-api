@@ -19,7 +19,7 @@ model Sound {
   type        String?  @db.VarChar
   createdAt   DateTime @default(now())
   updatedAt   DateTime @default(now()) @updatedAt
-  tag         Tag[]
+  tags        Tag[]
 }
 
 model Tag {

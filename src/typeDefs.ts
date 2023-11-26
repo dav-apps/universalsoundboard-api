@@ -17,6 +17,7 @@ export const typeDefs = `#graphql
 		createSound(
 			name: String!
 			description: String
+			tags: [String!]
 		): Sound
 	}
 

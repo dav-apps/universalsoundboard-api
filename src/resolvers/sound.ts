@@ -1,4 +1,5 @@
 import * as crypto from "crypto"
+import { Tag } from "@prisma/client"
 import { isSuccessStatusCode, TableObjectsController } from "dav-js"
 import { getUserById } from "../services/apiService.js"
 import { getSound, searchSounds } from "../services/freesoundApiService.js"
@@ -189,7 +190,7 @@ export async function listSounds(
 
 export async function createSound(
 	parent: any,
-	args: { name: string; description?: string },
+	args: { name: string; description?: string; tags?: string[] },
 	context: ResolverContext
 ): Promise<Sound> {
 	const user = context.user
@@ -206,15 +207,48 @@ export async function createSound(
 		throwValidationError(validateDescriptionLength(args.description))
 	}
 
+	let tags: Tag[] = []
+
+	if (args.tags != null) {
+		// Create the tags
+		for (let tagName of args.tags) {
+			// Check if the tag already exists
+			let tag = await context.prisma.tag.findFirst({
+				where: { name: tagName }
+			})
+
+			if (tag == null) {
+				// Create the tag
+				tag = await context.prisma.tag.create({
+					data: {
+						uuid: crypto.randomUUID(),
+						name: tagName
+					}
+				})
+			}
+
+			tags.push(tag)
+		}
+	}
+
 	// Create the sound
 	let uuid = crypto.randomUUID()
+
+	let tagsData = {
+		connect: []
+	}
+
+	for (let tag of tags) {
+		tagsData.connect.push({ id: tag.id })
+	}
 
 	let sound = await context.prisma.sound.create({
 		data: {
 			uuid,
 			userId: user.id,
 			name: args.name,
-			description: args.description
+			description: args.description,
+			tags: tagsData
 		}
 	})
 
