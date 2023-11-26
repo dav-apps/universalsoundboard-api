@@ -4,6 +4,7 @@ export async function getSound(id: number): Promise<{
 	id: number
 	url: string
 	name: string
+	tags: string[]
 	description: string
 	type: string
 	previews: {
@@ -18,7 +19,7 @@ export async function getSound(id: number): Promise<{
 				Authorization: `Token ${process.env.FREESOUND_API_KEY}`
 			},
 			params: {
-				fields: "id,url,name,description,type,previews"
+				fields: "id,url,name,tags,description,type,previews"
 			}
 		})
 
@@ -40,6 +41,7 @@ export async function searchSounds(params?: {
 		id: number
 		url: string
 		name: string
+		tags: string[]
 		description: string
 		type: string
 		previews: {
@@ -55,7 +57,7 @@ export async function searchSounds(params?: {
 				Authorization: `Token ${process.env.FREESOUND_API_KEY}`
 			},
 			params: {
-				fields: "id,url,name,description,type,previews",
+				fields: "id,url,name,tags,description,type,previews",
 				query: params.query,
 				sort: params.sort,
 				page: params.page ?? 1,

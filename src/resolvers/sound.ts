@@ -40,6 +40,7 @@ export async function retrieveSound(
 				audioFileUrl: sound.previews["preview-hq-mp3"],
 				type: sound.type,
 				source: sound.url,
+				tags: sound.tags,
 				createdAt: null,
 				updatedAt: null
 			}
@@ -47,8 +48,23 @@ export async function retrieveSound(
 	} else {
 		// Get the sound from the database
 		let sound = await context.prisma.sound.findFirst({
-			where: { uuid: args.uuid }
+			where: { uuid: args.uuid },
+			include: { tags: true }
 		})
+
+		if (sound == null) {
+			return {
+				caching: true,
+				data: null
+			}
+		}
+
+		// Get the tags of the sound
+		let tags: string[] = []
+
+		for (let tag of sound.tags) {
+			tags.push(tag.name)
+		}
 
 		return {
 			caching: true,
@@ -56,7 +72,8 @@ export async function retrieveSound(
 				...sound,
 				audioFileUrl:
 					sound.type != null ? getTableObjectFileUrl(sound.uuid) : null,
-				source: null
+				source: null,
+				tags
 			}
 		}
 	}
@@ -94,18 +111,26 @@ export async function listSounds(
 			context.prisma.sound.findMany({
 				where,
 				take,
-				skip
+				skip,
+				include: { tags: true }
 			})
 		])
 
 		let soundItems: Sound[] = []
 
 		for (let item of items) {
+			let tags: string[] = []
+
+			for (let tag of item.tags) {
+				tags.push(tag.name)
+			}
+
 			soundItems.push({
 				...item,
 				audioFileUrl:
 					item.type != null ? getTableObjectFileUrl(item.uuid) : null,
-				source: null
+				source: null,
+				tags
 			})
 		}
 
@@ -140,6 +165,7 @@ export async function listSounds(
 				audioFileUrl: item.previews["preview-hq-mp3"],
 				type: item.type,
 				source: item.url,
+				tags: item.tags,
 				createdAt: null,
 				updatedAt: null
 			})
@@ -173,6 +199,7 @@ export async function listSounds(
 				audioFileUrl: item.previews["preview-hq-mp3"],
 				type: item.type,
 				source: item.url,
+				tags: item.tags,
 				createdAt: null,
 				updatedAt: null
 			})
@@ -234,11 +261,13 @@ export async function createSound(
 	// Create the sound
 	let uuid = crypto.randomUUID()
 
+	let tagNames: string[] = []
 	let tagsData = {
 		connect: []
 	}
 
 	for (let tag of tags) {
+		tagNames.push(tag.name)
 		tagsData.connect.push({ id: tag.id })
 	}
 
@@ -267,7 +296,8 @@ export async function createSound(
 	return {
 		...sound,
 		audioFileUrl: null,
-		source: null
+		source: null,
+		tags: tagNames
 	}
 }
 

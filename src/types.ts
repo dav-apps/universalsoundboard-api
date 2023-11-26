@@ -51,5 +51,6 @@ export interface Sound extends SoundModel {
 	audioFileUrl: string
 	type: string
 	source: string
+	tags: string[]
 }
 //#endregion
