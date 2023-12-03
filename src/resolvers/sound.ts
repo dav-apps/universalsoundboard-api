@@ -301,6 +301,56 @@ export async function createSound(
 	}
 }
 
+export async function deleteSound(
+	parent: any,
+	args: { uuid: string },
+	context: ResolverContext
+): Promise<Sound> {
+	const user = context.user
+
+	// Check if the user is logged in
+	if (user == null) {
+		throwApiError(apiErrors.notAuthenticated)
+	}
+
+	// Get the sound from the database
+	let sound = await context.prisma.sound.findFirst({
+		where: { uuid: args.uuid },
+		include: { tags: true }
+	})
+
+	if (sound == null) {
+		return null
+	}
+
+	// Check if the sound belongs to the user
+	if (sound.userId != BigInt(user.id)) {
+		throwApiError(apiErrors.actionNotAllowed)
+	}
+
+	let tags: string[] = []
+
+	for (let tag of sound.tags) {
+		tags.push(tag.name)
+	}
+
+	// Delete the sound on the dav backend
+	await TableObjectsController.DeleteTableObject({
+		accessToken: context.accessToken,
+		uuid: args.uuid
+	})
+
+	// Delete the sound in the database
+	await context.prisma.sound.delete({ where: { uuid: args.uuid } })
+
+	return {
+		...sound,
+		audioFileUrl: null,
+		source: null,
+		tags
+	}
+}
+
 export async function user(
 	sound: Sound,
 	args: any,

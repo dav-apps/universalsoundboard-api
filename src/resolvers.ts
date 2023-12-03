@@ -49,7 +49,8 @@ export const resolvers = {
 			cachingResolver(parent, args, context, info, tagResolvers.listTags)
 	},
 	Mutation: {
-		createSound: soundResolvers.createSound
+		createSound: soundResolvers.createSound,
+		deleteSound: soundResolvers.deleteSound
 	},
 	Sound: {
 		user: (parent: any, args: any, context: ResolverContext, info: any) =>

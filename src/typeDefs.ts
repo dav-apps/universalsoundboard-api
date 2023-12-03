@@ -19,6 +19,7 @@ export const typeDefs = `#graphql
 			description: String
 			tags: [String!]
 		): Sound
+		deleteSound(uuid: String!): Sound
 	}
 
 	type User {
