@@ -19,6 +19,12 @@ export const typeDefs = `#graphql
 			description: String
 			tags: [String!]
 		): Sound
+		updateSound(
+			uuid: String!
+			name: String
+			description: String
+			tags: [String!]
+		): Sound
 		deleteSound(uuid: String!): Sound
 	}
 

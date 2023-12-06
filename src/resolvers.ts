@@ -50,6 +50,7 @@ export const resolvers = {
 	},
 	Mutation: {
 		createSound: soundResolvers.createSound,
+		updateSound: soundResolvers.updateSound,
 		deleteSound: soundResolvers.deleteSound
 	},
 	Sound: {

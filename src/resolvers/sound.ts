@@ -1,5 +1,5 @@
 import * as crypto from "crypto"
-import { Tag } from "@prisma/client"
+import { PrismaClient, Tag } from "@prisma/client"
 import { isSuccessStatusCode, TableObjectsController } from "dav-js"
 import { getUserById } from "../services/apiService.js"
 import { getSound, searchSounds } from "../services/freesoundApiService.js"
@@ -67,7 +67,8 @@ export async function retrieveSound(
 		}
 
 		return {
-			caching: (context.user == null || sound.userId != BigInt(context.user.id)),
+			caching:
+				context.user == null || sound.userId != BigInt(context.user.id),
 			data: {
 				...sound,
 				audioFileUrl:
@@ -234,29 +235,7 @@ export async function createSound(
 		throwValidationError(validateDescriptionLength(args.description))
 	}
 
-	let tags: Tag[] = []
-
-	if (args.tags != null) {
-		// Create the tags
-		for (let tagName of args.tags) {
-			// Check if the tag already exists
-			let tag = await context.prisma.tag.findFirst({
-				where: { name: tagName }
-			})
-
-			if (tag == null) {
-				// Create the tag
-				tag = await context.prisma.tag.create({
-					data: {
-						uuid: crypto.randomUUID(),
-						name: tagName
-					}
-				})
-			}
-
-			tags.push(tag)
-		}
-	}
+	let tags = await getTags(args.tags, context.prisma)
 
 	// Create the sound
 	let uuid = crypto.randomUUID()
@@ -298,6 +277,111 @@ export async function createSound(
 		audioFileUrl: null,
 		source: null,
 		tags: tagNames
+	}
+}
+
+export async function updateSound(
+	parent: any,
+	args: { uuid: string; name?: string; description?: string; tags?: string[] },
+	context: ResolverContext
+): Promise<Sound> {
+	const uuid = args.uuid
+	const user = context.user
+
+	if (uuid == null) return null
+
+	// Check if the user is logged in
+	if (user == null) {
+		throwApiError(apiErrors.notAuthenticated)
+	}
+
+	// Get the sound
+	let sound = await context.prisma.sound.findFirst({
+		where: { uuid: args.uuid },
+		include: { tags: true }
+	})
+
+	if (sound == null) {
+		throwApiError(apiErrors.soundNotExists)
+	}
+
+	// Check if the sound belongs to the user
+	if (sound.userId != BigInt(user.id)) {
+		throwApiError(apiErrors.actionNotAllowed)
+	}
+
+	// Validate the args
+	let errors: string[] = []
+
+	if (args.name != null) {
+		errors.push(validateNameLength(args.name))
+	}
+
+	if (args.description != null) {
+		errors.push(validateDescriptionLength(args.description))
+	}
+
+	throwValidationError(...errors)
+
+	// Update the sound
+	let data = {}
+
+	if (args.name != null) {
+		data["name"] = args.name
+	}
+
+	if (args.description != null) {
+		data["description"] = args.description
+	}
+
+	// Remove all tag connections
+	if (args.tags != null) {
+		let disconnect = []
+
+		for (let tag of sound.tags) {
+			disconnect.push({
+				uuid: tag.uuid
+			})
+		}
+
+		data["tags"] = { disconnect }
+	}
+
+	await context.prisma.sound.update({
+		where: { uuid: args.uuid },
+		data
+	})
+
+	// Create the new tag connections
+	let connect = []
+	let tags = await getTags(args.tags, context.prisma)
+
+	for (let tag of tags) {
+		connect.push({
+			uuid: tag.uuid
+		})
+	}
+
+	let result = await context.prisma.sound.update({
+		where: { uuid: args.uuid },
+		data: {
+			tags: { connect }
+		},
+		include: { tags: true }
+	})
+
+	let tagsResult: string[] = []
+
+	for (let tag of result.tags) {
+		tagsResult.push(tag.name)
+	}
+
+	return {
+		...result,
+		audioFileUrl:
+			sound.type != null ? getTableObjectFileUrl(sound.uuid) : null,
+		source: null,
+		tags: tagsResult
 	}
 }
 
@@ -377,4 +461,36 @@ export async function user(
 		caching: true,
 		data: null
 	}
+}
+
+async function getTags(tags: string[], prisma: PrismaClient): Promise<Tag[]> {
+	if (tags == null) return []
+
+	let result: Tag[] = []
+
+	for (let tagName of tags) {
+		// Check if the tag already exists
+		let tag = await prisma.tag.findFirst({
+			where: { name: tagName }
+		})
+
+		if (tag == null) {
+			// Validate the tag
+			if (tagName.length < 2 || tagName.length > 20) {
+				continue
+			}
+
+			// Create the tag
+			tag = await prisma.tag.create({
+				data: {
+					uuid: crypto.randomUUID(),
+					name: tagName
+				}
+			})
+		}
+
+		result.push(tag)
+	}
+
+	return result
 }
