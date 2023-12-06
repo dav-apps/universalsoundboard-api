@@ -67,7 +67,7 @@ export async function retrieveSound(
 		}
 
 		return {
-			caching: true,
+			caching: (context.user == null || sound.userId != BigInt(context.user.id)),
 			data: {
 				...sound,
 				audioFileUrl:
