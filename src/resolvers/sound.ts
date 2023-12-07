@@ -1,5 +1,6 @@
 import * as crypto from "crypto"
 import { PrismaClient, Tag } from "@prisma/client"
+import { DateTime } from "luxon"
 import { isSuccessStatusCode, TableObjectsController } from "dav-js"
 import { getUserById } from "../services/apiService.js"
 import { getSound, searchSounds } from "../services/freesoundApiService.js"
@@ -86,6 +87,7 @@ export async function listSounds(
 		mine?: boolean
 		userId?: number
 		random?: boolean
+		latest?: boolean
 		query?: string
 		limit?: number
 		offset?: number
@@ -179,14 +181,90 @@ export async function listSounds(
 				items
 			}
 		}
+	} else if (args.latest) {
+		let searchResult = await searchSounds({
+			sort: "created_desc",
+			pageSize: take + 1
+		})
+
+		if (searchResult == null) {
+			return null
+		}
+
+		let items: Sound[] = []
+
+		// Get sounds that are newer than the last freesound item
+		let lastItem = searchResult.results.pop()
+		let createdDate = DateTime.fromISO(lastItem.created)
+
+		let sounds = await context.prisma.sound.findMany({
+			where: { createdAt: { gt: createdDate.toISO() } },
+			include: { tags: true },
+			take
+		})
+
+		for (let sound of sounds) {
+			// Get the tags of the sound
+			let tags: string[] = []
+
+			for (let tag of sound.tags) {
+				tags.push(tag.name)
+			}
+
+			items.push({
+				...sound,
+				audioFileUrl:
+					sound.type != null ? getTableObjectFileUrl(sound.uuid) : null,
+				source: null,
+				tags
+			})
+		}
+
+		// Get the remaining sounds from the freesound API to fill the array
+		let remainingSoundsCount = take - items.length
+		let freesoundItems = searchResult.results
+
+		for (let i = 0; i < remainingSoundsCount; i++) {
+			// Get a random item from the freesound sounds
+			let num = randomNumber(0, freesoundItems.length - 1)
+			let item = freesoundItems.splice(num, 1)[0]
+
+			// Insert the item at a random position in the existing sounds
+			let num2 = randomNumber(0, items.length - 1)
+			if (items.length == 0) num2 = 0
+
+			items.splice(num2, 0, {
+				id: BigInt(item.id),
+				uuid: await generateUuidForFreesoundItem(item.id),
+				userId: BigInt(0),
+				name: item.name,
+				description: item.description,
+				audioFileUrl: item.previews["preview-hq-mp3"],
+				type: item.type,
+				source: item.url,
+				tags: item.tags,
+				createdAt: null,
+				updatedAt: null
+			})
+		}
+
+		return {
+			caching: true,
+			data: {
+				total: items.length,
+				items
+			}
+		}
 	} else {
 		let searchResult = await searchSounds({
-			sort: args.query ? null : "created_desc",
 			query: args.query,
 			page: skip > 0 ? Math.floor(skip / take) + 1 : 1,
 			pageSize: take
 		})
-		if (searchResult == null) return null
+
+		if (searchResult == null) {
+			return null
+		}
 
 		let items: Sound[] = []
 

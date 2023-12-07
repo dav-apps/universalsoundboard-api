@@ -6,6 +6,7 @@ export const typeDefs = `#graphql
 			mine: Boolean
 			userId: Int
 			random: Boolean
+			latest: Boolean
 			query: String
 			limit: Int
 			offset: Int

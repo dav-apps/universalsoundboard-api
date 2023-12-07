@@ -43,6 +43,7 @@ export async function searchSounds(params?: {
 		name: string
 		tags: string[]
 		description: string
+		created: string
 		type: string
 		previews: {
 			"preview-hq-mp3": string
@@ -57,7 +58,7 @@ export async function searchSounds(params?: {
 				Authorization: `Token ${process.env.FREESOUND_API_KEY}`
 			},
 			params: {
-				fields: "id,url,name,tags,description,type,previews",
+				fields: "id,url,name,tags,description,created,type,previews",
 				query: params.query,
 				sort: params.sort,
 				page: params.page ?? 1,
