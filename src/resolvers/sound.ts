@@ -145,33 +145,69 @@ export async function listSounds(
 			}
 		}
 	} else if (args.random) {
-		let initialSearchResult = await searchSounds({ pageSize: 1 })
-		let totalItems = initialSearchResult.count
-		let pages = Math.floor(totalItems / take)
-		let index = randomNumber(1, pages)
-
-		let searchResult = await searchSounds({
-			sort: "created_desc",
-			page: index,
-			pageSize: take
-		})
-
 		let items: Sound[] = []
 
-		for (let item of searchResult.results) {
+		// Get the promoted sounds
+		let now = new Date()
+
+		let activeSoundPromotions = await context.prisma.soundPromotion.findMany({
+			where: { paid: true, startDate: { lt: now }, endDate: { gt: now } },
+			include: { sound: { include: { tags: true } } },
+			take
+		})
+
+		for (let soundPromotion of activeSoundPromotions) {
+			let sound = soundPromotion.sound
+
+			// Check if the sound was already added
+			let i = items.findIndex(item => item.uuid == sound.uuid)
+			if (i != -1) continue
+
+			let tags: string[] = []
+
+			for (let tag of sound.tags) {
+				tags.push(tag.name)
+			}
+
 			items.push({
-				id: BigInt(item.id),
-				uuid: await generateUuidForFreesoundItem(item.id),
-				userId: BigInt(0),
-				name: item.name,
-				description: item.description,
-				audioFileUrl: item.previews["preview-hq-mp3"],
-				type: item.type,
-				source: item.url,
-				tags: item.tags,
-				createdAt: null,
-				updatedAt: null
+				...soundPromotion.sound,
+				audioFileUrl:
+					sound.type != null ? getTableObjectFileUrl(sound.uuid) : null,
+				source: null,
+				tags
 			})
+		}
+
+		let initialSearchResult = await searchSounds({ pageSize: 1 })
+		let totalItems = initialSearchResult.count
+
+		if (items.length < take) {
+			take = take - items.length
+
+			let pages = Math.floor(totalItems / take)
+			let index = randomNumber(1, pages)
+
+			let searchResult = await searchSounds({
+				sort: "created_desc",
+				page: index,
+				pageSize: take
+			})
+
+			for (let item of searchResult.results) {
+				items.push({
+					id: BigInt(item.id),
+					uuid: await generateUuidForFreesoundItem(item.id),
+					userId: BigInt(0),
+					name: item.name,
+					description: item.description,
+					audioFileUrl: item.previews["preview-hq-mp3"],
+					type: item.type,
+					source: item.url,
+					tags: item.tags,
+					createdAt: null,
+					updatedAt: null
+				})
+			}
 		}
 
 		return {
