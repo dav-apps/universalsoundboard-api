@@ -1,5 +1,5 @@
 import * as crypto from "crypto"
-import { PrismaClient, Tag } from "@prisma/client"
+import { PrismaClient, SoundPromotion, Tag } from "@prisma/client"
 import { DateTime } from "luxon"
 import { isSuccessStatusCode, TableObjectsController } from "dav-js"
 import { getUserById } from "../services/apiService.js"
@@ -574,6 +574,28 @@ export async function user(
 	return {
 		caching: true,
 		data: null
+	}
+}
+
+export async function promotion(
+	sound: Sound,
+	args: any,
+	context: ResolverContext
+): Promise<QueryResult<SoundPromotion>> {
+	let now = new Date()
+
+	let soundPromotion = await context.prisma.soundPromotion.findFirst({
+		where: {
+			soundId: sound.id,
+			paid: true,
+			startDate: { lt: now },
+			endDate: { gt: now }
+		}
+	})
+
+	return {
+		caching: false,
+		data: soundPromotion
 	}
 }
 

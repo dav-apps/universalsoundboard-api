@@ -44,6 +44,7 @@ export const typeDefs = `#graphql
 		audioFileUrl: String
 		type: String
 		source: String
+		promotion: SoundPromotion
 		tags: [String!]!
 	}
 

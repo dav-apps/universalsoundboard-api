@@ -57,6 +57,13 @@ export const resolvers = {
 	},
 	Sound: {
 		user: (parent: any, args: any, context: ResolverContext, info: any) =>
-			cachingResolver(parent, args, context, info, soundResolvers.user)
+			cachingResolver(parent, args, context, info, soundResolvers.user),
+		promotion: (
+			parent: any,
+			args: any,
+			context: ResolverContext,
+			info: any
+		) =>
+			cachingResolver(parent, args, context, info, soundResolvers.promotion)
 	}
 }
