@@ -14,6 +14,7 @@ import { apiErrors } from "./src/errors.js"
 import { getUser } from "./src/services/apiService.js"
 import { typeDefs } from "./src/typeDefs.js"
 import { resolvers } from "./src/resolvers.js"
+import { setup as webhookSetup } from "./src/endpoints/webhooks.js"
 import { setup as soundSetup } from "./src/endpoints/sound.js"
 
 const port = process.env.PORT || 4003
@@ -62,6 +63,7 @@ new Dav({
 })
 
 // Call setup functions of each endpoint file
+webhookSetup(app)
 soundSetup(app)
 
 app.use(
