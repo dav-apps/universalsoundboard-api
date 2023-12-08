@@ -44,6 +44,12 @@ export interface User {
 	profileImage: string
 	profileImageEtag: string
 }
+
+export interface TableObjectPrice {
+	tableObjectUuid: string
+	price: number
+	currency: string
+}
 //#endregion
 
 //#region UniversalSoundboard models

@@ -1,5 +1,5 @@
 import axios from "axios"
-import { UserApiResponse } from "../types.js"
+import { UserApiResponse, TableObjectPrice } from "../types.js"
 import {
 	apiBaseUrlDevelopment,
 	apiBaseUrlStaging,
@@ -86,5 +86,35 @@ export async function getUserById(id: number): Promise<UserApiResponse> {
 			status: error.response?.status || 500,
 			errors: error.response?.data?.errors
 		}
+	}
+}
+
+export async function setTableObjectPrice(params: {
+	uuid: string
+	price: number
+	currency: string
+}): Promise<TableObjectPrice> {
+	try {
+		let response = await axios({
+			method: "put",
+			url: `${getApiBaseUrl()}/v2/table_objects/${params.uuid}/price`,
+			headers: {
+				Authorization: process.env.DAV_AUTH,
+				"Content-Type": "application/json"
+			},
+			data: {
+				price: params.price,
+				currency: params.currency
+			}
+		})
+
+		return {
+			tableObjectUuid: response.data.table_object_uuid,
+			price: response.data.price,
+			currency: response.data.currency
+		}
+	} catch (error) {
+		console.error(error.response?.data || error)
+		return null
 	}
 }

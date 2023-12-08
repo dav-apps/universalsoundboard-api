@@ -27,6 +27,7 @@ export const typeDefs = `#graphql
 			tags: [String!]
 		): Sound
 		deleteSound(uuid: String!): Sound
+		createSoundPromotion(uuid: String!): SoundPromotion
 	}
 
 	type User {
@@ -49,6 +50,17 @@ export const typeDefs = `#graphql
 	type SoundList {
 		total: Int!
 		items: [Sound!]!
+	}
+
+	type SoundPromotion {
+		uuid: String!
+		sound: Sound!
+		startDate: String!
+		endDate: String!
+		price: Int!
+		currency: String!
+		sessionUrl: String!
+		paid: Boolean!
 	}
 
 	type Tag {

@@ -2,6 +2,7 @@ import { ResolverContext } from "./types.js"
 import { cachingResolver } from "./services/cachingService.js"
 import * as userResolvers from "./resolvers/user.js"
 import * as soundResolvers from "./resolvers/sound.js"
+import * as soundPromotionResolvers from "./resolvers/soundPromotion.js"
 import * as tagResolvers from "./resolvers/tag.js"
 
 export const resolvers = {
@@ -51,7 +52,8 @@ export const resolvers = {
 	Mutation: {
 		createSound: soundResolvers.createSound,
 		updateSound: soundResolvers.updateSound,
-		deleteSound: soundResolvers.deleteSound
+		deleteSound: soundResolvers.deleteSound,
+		createSoundPromotion: soundPromotionResolvers.createSoundPromotion
 	},
 	Sound: {
 		user: (parent: any, args: any, context: ResolverContext, info: any) =>
