@@ -1,14 +1,25 @@
-import { throwEndpointError } from "../utils.js"
+import { ApiError } from "../types.js"
 import { apiErrors, validationErrors } from "../errors.js"
 
 //#region Endpoint validations
-export async function validateAudioContentType(contentType: string) {
+export function validateJsonContentType(
+	contentType: string
+): ApiError | undefined {
+	if (contentType == null || !contentType.includes("application/json")) {
+		return apiErrors.contentTypeNotSupported
+	}
+}
+
+export function validateAudioContentType(
+	contentType: string
+): ApiError | undefined {
 	if (
+		contentType == null ||
 		!["audio/mpeg", "audio/mp4", "audio/wav", "audio/ogg"].includes(
 			contentType
 		)
 	) {
-		throwEndpointError(apiErrors.contentTypeNotSupported)
+		return apiErrors.contentTypeNotSupported
 	}
 }
 //#endregion

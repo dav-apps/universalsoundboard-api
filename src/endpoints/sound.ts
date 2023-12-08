@@ -23,7 +23,7 @@ export async function uploadSoundFile(req: Request, res: Response) {
 
 		// Check if content type is supported
 		const contentType = req.headers["content-type"]
-		validateAudioContentType(contentType)
+		throwEndpointError(validateAudioContentType(contentType))
 
 		// Get the sound
 		let sound = await prisma.sound.findFirst({ where: { uuid } })
