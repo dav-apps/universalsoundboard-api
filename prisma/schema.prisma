@@ -11,15 +11,29 @@ datasource db {
 }
 
 model Sound {
-  id          BigInt   @id @default(autoincrement())
-  uuid        String   @unique @db.VarChar
-  userId      BigInt   @default(0)
-  name        String   @db.VarChar
-  description String?  @db.VarChar
-  type        String?  @db.VarChar
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @default(now()) @updatedAt
+  id          BigInt           @id @default(autoincrement())
+  uuid        String           @unique @db.VarChar
+  userId      BigInt           @default(0)
+  name        String           @db.VarChar
+  description String?          @db.VarChar
+  type        String?          @db.VarChar
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @default(now()) @updatedAt
+  promotions  SoundPromotion[]
   tags        Tag[]
+}
+
+model SoundPromotion {
+  id         BigInt   @id @default(autoincrement())
+  uuid       String   @unique @db.VarChar
+  sound      Sound    @relation(fields: [soundId], references: [id])
+  soundId    BigInt
+  startDate  DateTime @default(now())
+  endDate    DateTime
+  price      Int      @default(0)
+  currency   String   @default("eur")
+  sessionUrl String
+  paid       Boolean  @default(false)
 }
 
 model Tag {
