@@ -15,7 +15,7 @@ export function validateAudioContentType(
 ): ApiError | undefined {
 	if (
 		contentType == null ||
-		!["audio/mpeg", "audio/mp4", "audio/wav", "audio/ogg"].includes(
+		!["audio/mpeg", "audio/m4a", "audio/wav", "audio/ogg"].includes(
 			contentType
 		)
 	) {

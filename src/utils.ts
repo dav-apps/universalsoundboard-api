@@ -89,8 +89,8 @@ export function getFileExtensionByContentType(contentType: string): string {
 	switch (contentType) {
 		case "audio/mpeg":
 			return "mp3"
-		case "audio/mp4":
-			return "mp4"
+		case "audio/m4a":
+			return "m4a"
 		case "audio/wav":
 			return "wav"
 		case "audio/ogg":
