@@ -14,7 +14,7 @@ import { apiErrors } from "../errors.js"
 
 export async function createSoundPromotion(
 	parent: any,
-	args: { uuid: string },
+	args: { uuid: string; title?: string },
 	context: ResolverContext
 ) {
 	const user = context.user
@@ -63,7 +63,7 @@ export async function createSoundPromotion(
 			successUrl:
 				"https://universalsoundboard.dav-apps.tech/sound-promotion?success=true",
 			cancelUrl: "https://universalsoundboard.dav-apps.tech/sound-promotion",
-			productName: "Sound promotion",
+			productName: args.title ?? "Sound promotion",
 			productImage:
 				"https://dav-backend.fra1.cdn.digitaloceanspaces.com/misc/sound-promotion.jpg"
 		})
