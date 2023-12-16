@@ -1,5 +1,6 @@
 import { Express, Request, Response, raw } from "express"
 import cors from "cors"
+import * as mm from "music-metadata"
 import { TableObjectsController, isSuccessStatusCode } from "dav-js"
 import {
 	handleEndpointError,
@@ -50,10 +51,32 @@ export async function uploadSoundFile(req: Request, res: Response) {
 			throwEndpointError(apiErrors.unexpectedError)
 		}
 
+		// Try to get the audio metadata
+		let channels = null
+		let sampleRate = null
+		let duration = null
+
+		try {
+			const metadata = await mm.parseBuffer(req.body, {
+				mimeType: contentType
+			})
+
+			channels = metadata.format.numberOfChannels
+			sampleRate = metadata.format.sampleRate
+			duration = metadata.format.duration
+		} catch (error) {
+			console.log(error)
+		}
+
 		// Update the sound with the type
 		await prisma.sound.update({
 			where: { id: sound.id },
-			data: { type: getFileExtensionByContentType(contentType) }
+			data: {
+				type: getFileExtensionByContentType(contentType),
+				channels,
+				sampleRate,
+				duration
+			}
 		})
 
 		res.status(200).json({ uuid: sound.uuid })
