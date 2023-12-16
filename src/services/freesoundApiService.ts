@@ -7,6 +7,9 @@ export async function getSound(id: number): Promise<{
 	tags: string[]
 	description: string
 	type: string
+	channels: number
+	duration: number
+	samplerate: number
 	previews: {
 		"preview-hq-mp3": string
 	}
@@ -19,7 +22,8 @@ export async function getSound(id: number): Promise<{
 				Authorization: `Token ${process.env.FREESOUND_API_KEY}`
 			},
 			params: {
-				fields: "id,url,name,tags,description,type,previews"
+				fields:
+					"id,url,name,tags,description,type,channels,duration,samplerate,previews"
 			}
 		})
 
@@ -45,6 +49,9 @@ export async function searchSounds(params?: {
 		description: string
 		created: string
 		type: string
+		channels: number
+		duration: number
+		samplerate: number
 		previews: {
 			"preview-hq-mp3": string
 		}
@@ -58,7 +65,8 @@ export async function searchSounds(params?: {
 				Authorization: `Token ${process.env.FREESOUND_API_KEY}`
 			},
 			params: {
-				fields: "id,url,name,tags,description,created,type,previews",
+				fields:
+					"id,url,name,tags,description,created,type,channels,duration,samplerate,previews",
 				query: params.query,
 				sort: params.sort,
 				page: params.page ?? 1,

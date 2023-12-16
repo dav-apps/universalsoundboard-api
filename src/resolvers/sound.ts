@@ -1,5 +1,5 @@
 import * as crypto from "crypto"
-import { PrismaClient, SoundPromotion, Tag } from "@prisma/client"
+import { Prisma, PrismaClient, SoundPromotion, Tag } from "@prisma/client"
 import { DateTime } from "luxon"
 import { isSuccessStatusCode, TableObjectsController } from "dav-js"
 import { getUserById } from "../services/apiService.js"
@@ -40,6 +40,9 @@ export async function retrieveSound(
 				description: sound.description,
 				audioFileUrl: sound.previews["preview-hq-mp3"],
 				type: sound.type,
+				channels: sound.channels,
+				sampleRate: sound.samplerate,
+				duration: new Prisma.Decimal(sound.duration),
 				source: sound.url,
 				tags: sound.tags,
 				createdAt: null,
@@ -202,6 +205,9 @@ export async function listSounds(
 					description: item.description,
 					audioFileUrl: item.previews["preview-hq-mp3"],
 					type: item.type,
+					channels: item.channels,
+					sampleRate: item.samplerate,
+					duration: new Prisma.Decimal(item.duration),
 					source: item.url,
 					tags: item.tags,
 					createdAt: null,
@@ -277,6 +283,9 @@ export async function listSounds(
 				description: item.description,
 				audioFileUrl: item.previews["preview-hq-mp3"],
 				type: item.type,
+				channels: item.channels,
+				sampleRate: item.samplerate,
+				duration: new Prisma.Decimal(item.duration),
 				source: item.url,
 				tags: item.tags,
 				createdAt: null,
@@ -313,6 +322,9 @@ export async function listSounds(
 				description: item.description,
 				audioFileUrl: item.previews["preview-hq-mp3"],
 				type: item.type,
+				channels: item.channels,
+				sampleRate: item.samplerate,
+				duration: new Prisma.Decimal(item.duration),
 				source: item.url,
 				tags: item.tags,
 				createdAt: null,
