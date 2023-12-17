@@ -21,6 +21,7 @@ model Sound {
   duration    Decimal?
   promotions  SoundPromotion[]
   tags        Tag[]            @relation("SoundToTag")
+  reports     SoundReport[]
 }
 
 model SoundPromotion {
@@ -34,6 +35,15 @@ model SoundPromotion {
   sessionUrl String
   paid       Boolean  @default(false)
   sound      Sound    @relation(fields: [soundId], references: [id])
+}
+
+model SoundReport {
+  id          BigInt  @id @default(autoincrement())
+  uuid        String  @unique @db.VarChar
+  userId      BigInt?
+  soundId     BigInt
+  description String  @db.VarChar
+  sound       Sound   @relation(fields: [soundId], references: [id])
 }
 
 model Tag {
