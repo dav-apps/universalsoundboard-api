@@ -1,5 +1,6 @@
 import * as crypto from "crypto"
 import { DateTime } from "luxon"
+import { SoundPromotion } from "@prisma/client"
 import {
 	CheckoutSessionsController,
 	TableObjectsController,
@@ -16,7 +17,7 @@ export async function createSoundPromotion(
 	parent: any,
 	args: { uuid: string; title?: string },
 	context: ResolverContext
-) {
+): Promise<SoundPromotion> {
 	const user = context.user
 
 	// Check if the user is logged in
@@ -81,7 +82,7 @@ export async function createSoundPromotion(
 	// Create the SoundPromotion
 	let now = DateTime.now()
 
-	let soundPromotion = await context.prisma.soundPromotion.create({
+	return await context.prisma.soundPromotion.create({
 		data: {
 			uuid,
 			startDate: now.toJSDate(),
@@ -96,6 +97,4 @@ export async function createSoundPromotion(
 			}
 		}
 	})
-
-	return soundPromotion
 }
