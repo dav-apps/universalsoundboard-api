@@ -31,6 +31,10 @@ export const typeDefs = `#graphql
 			uuid: String!
 			title: String
 		): SoundPromotion
+		createSoundReport(
+			uuid: String!
+			description: String!
+		): SoundReport
 	}
 
 	type User {
@@ -68,6 +72,13 @@ export const typeDefs = `#graphql
 		currency: String!
 		sessionUrl: String!
 		paid: Boolean!
+	}
+
+	type SoundReport {
+		uuid: String!
+		user: User
+		sound: Sound!
+		description: String!
 	}
 
 	type Tag {

@@ -3,6 +3,7 @@ import { cachingResolver } from "./services/cachingService.js"
 import * as userResolvers from "./resolvers/user.js"
 import * as soundResolvers from "./resolvers/sound.js"
 import * as soundPromotionResolvers from "./resolvers/soundPromotion.js"
+import * as soundReportResolvers from "./resolvers/soundReport.js"
 import * as tagResolvers from "./resolvers/tag.js"
 
 export const resolvers = {
@@ -53,7 +54,8 @@ export const resolvers = {
 		createSound: soundResolvers.createSound,
 		updateSound: soundResolvers.updateSound,
 		deleteSound: soundResolvers.deleteSound,
-		createSoundPromotion: soundPromotionResolvers.createSoundPromotion
+		createSoundPromotion: soundPromotionResolvers.createSoundPromotion,
+		createSoundReport: soundReportResolvers.createSoundReport
 	},
 	Sound: {
 		user: (parent: any, args: any, context: ResolverContext, info: any) =>
