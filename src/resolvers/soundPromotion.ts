@@ -9,16 +9,19 @@ import {
 	CreateCheckoutSessionResponseData
 } from "dav-js"
 import { setTableObjectPrice } from "../services/apiService.js"
-import { ResolverContext } from "../types.js"
-import { throwApiError } from "../utils.js"
+import { validateCurrency } from "../services/validationService.js"
+import { ResolverContext, Currency } from "../types.js"
+import { throwApiError, throwValidationError } from "../utils.js"
 import { apiErrors } from "../errors.js"
 
 export async function createSoundPromotion(
 	parent: any,
-	args: { uuid: string; title?: string },
+	args: { uuid: string; title?: string; currency?: Currency },
 	context: ResolverContext
 ): Promise<SoundPromotion> {
 	const user = context.user
+	const currency = args.currency ?? "eur"
+	const price = 150
 
 	// Check if the user is logged in
 	if (user == null) {
@@ -33,6 +36,9 @@ export async function createSoundPromotion(
 	if (sound == null) {
 		throwApiError(apiErrors.soundNotExists)
 	}
+
+	// Validate the currency
+	throwValidationError(validateCurrency(currency))
 
 	// Create the SoundPromotion table object
 	let uuid = crypto.randomUUID()
@@ -51,15 +57,15 @@ export async function createSoundPromotion(
 	// Set the price of the table object
 	await setTableObjectPrice({
 		uuid,
-		price: 150,
-		currency: "eur"
+		price,
+		currency
 	})
 
 	let createCheckoutSessionResponse =
 		await CheckoutSessionsController.CreateCheckoutSession({
 			accessToken: context.accessToken,
 			mode: "payment",
-			currency: "eur",
+			currency,
 			tableObjects: [uuid],
 			successUrl:
 				"https://universalsoundboard.dav-apps.tech/sound-promotion?success=true",
@@ -87,8 +93,8 @@ export async function createSoundPromotion(
 			uuid,
 			startDate: now.toJSDate(),
 			endDate: now.plus({ days: 3 }).toJSDate(),
-			price: 150,
-			currency: "eur",
+			price,
+			currency,
 			sessionUrl,
 			sound: {
 				connect: {

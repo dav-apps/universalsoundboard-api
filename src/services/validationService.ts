@@ -38,4 +38,10 @@ export function validateDescriptionLength(description: string) {
 		return validationErrors.descriptionTooLong
 	}
 }
+
+export function validateCurrency(currency: string) {
+	if (!["eur", "usd"].includes(currency)) {
+		return validationErrors.currencyInvalid
+	}
+}
 //#endregion

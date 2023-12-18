@@ -30,6 +30,8 @@ export interface UserApiResponse {
 	errors?: { code: number; message: string }[]
 }
 
+export type Currency = "eur" | "usd"
+
 //#region Platform models
 export interface User {
 	id: number

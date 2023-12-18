@@ -30,6 +30,7 @@ export const typeDefs = `#graphql
 		createSoundPromotion(
 			uuid: String!
 			title: String
+			currency: String
 		): SoundPromotion
 		createSoundReport(
 			uuid: String!
