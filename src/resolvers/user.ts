@@ -4,13 +4,14 @@ import { ResolverContext, QueryResult, User } from "../types.js"
 
 export async function retrieveUser(
 	parent: any,
-	args: { id: number },
+	args: { id?: number },
 	context: ResolverContext
 ): Promise<QueryResult<User>> {
-	if (args.id <= 0) {
+	// If id == null, return the authenticated user
+	if (args.id == null || args.id <= 0) {
 		return {
-			caching: true,
-			data: null
+			caching: false,
+			data: context.user
 		}
 	}
 
