@@ -1,11 +1,12 @@
 import { PrismaClient, Sound as SoundModel } from "@prisma/client"
 import { RedisClientType } from "redis"
+import { User as DavUser } from "dav-js"
 
 export interface ResolverContext {
 	prisma: PrismaClient
 	redis: RedisClientType
 	accessToken?: string
-	user?: User
+	user?: DavUser
 }
 
 export interface QueryResult<T> {
@@ -24,29 +25,9 @@ export interface ApiError {
 	status?: number
 }
 
-export interface UserApiResponse {
-	status: number
-	data?: User
-	errors?: { code: number; message: string }[]
-}
-
 export type Currency = "EUR" | "USD"
 
 //#region Platform models
-export interface User {
-	id: number
-	email: string
-	firstName: string
-	confirmed: boolean
-	totalStorage: number
-	usedStorage: number
-	plan: number
-	dev: boolean
-	provider: boolean
-	profileImage: string
-	profileImageEtag: string
-}
-
 export interface TableObjectPrice {
 	tableObjectUuid: string
 	price: number
@@ -55,6 +36,12 @@ export interface TableObjectPrice {
 //#endregion
 
 //#region UniversalSoundboard models
+export interface User {
+	id: number
+	firstName: string
+	profileImage: string
+}
+
 export interface Sound extends SoundModel {
 	audioFileUrl: string
 	type: string

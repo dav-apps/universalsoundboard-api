@@ -26,7 +26,7 @@ export async function createSoundReport(
 	return await context.prisma.soundReport.create({
 		data: {
 			uuid: crypto.randomUUID(),
-			userId: context.user?.id ?? null,
+			userId: context.user?.Id ?? null,
 			description: args.description,
 			sound: { connect: { id: sound.id } }
 		}

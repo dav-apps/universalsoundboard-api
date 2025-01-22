@@ -1,5 +1,5 @@
-import { isSuccessStatusCode } from "dav-js"
-import { getUserById } from "../services/apiService.js"
+import { Auth, UsersController } from "dav-js"
+import { convertDavUserToUser } from "../utils.js"
 import { ResolverContext, QueryResult, User } from "../types.js"
 
 export async function retrieveUser(
@@ -11,17 +11,33 @@ export async function retrieveUser(
 	if (args.id == null || args.id <= 0) {
 		return {
 			caching: false,
-			data: context.user
+			data: convertDavUserToUser(context.user)
 		}
 	}
 
 	// Get the user from the API
-	let response = await getUserById(args.id)
+	let response = await UsersController.retrieveUserById(
+		`
+			id
+			firstName
+			profileImage {
+				url
+			}
+		`,
+		{
+			auth: new Auth({
+				apiKey: process.env.DAV_API_KEY,
+				secretKey: process.env.DAV_SECRET_KEY,
+				uuid: process.env.DAV_UUID
+			}),
+			id: args.id
+		}
+	)
 
-	if (isSuccessStatusCode(response.status)) {
+	if (!Array.isArray(response)) {
 		return {
 			caching: true,
-			data: response.data
+			data: convertDavUserToUser(response)
 		}
 	}
 

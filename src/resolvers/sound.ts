@@ -1,8 +1,12 @@
 import * as crypto from "crypto"
 import { Prisma, PrismaClient, SoundPromotion, Tag } from "@prisma/client"
 import { DateTime } from "luxon"
-import { isSuccessStatusCode, TableObjectsController } from "dav-js"
-import { getUserById } from "../services/apiService.js"
+import {
+	Auth,
+	User as DavUser,
+	TableObjectsController,
+	UsersController
+} from "dav-js"
 import { getSound, searchSounds } from "../services/freesoundApiService.js"
 import { ResolverContext, QueryResult, List, User, Sound } from "../types.js"
 import {
@@ -10,7 +14,8 @@ import {
 	throwValidationError,
 	generateUuidForFreesoundItem,
 	getTableObjectFileUrl,
-	randomNumber
+	randomNumber,
+	convertDavUserToUser
 } from "../utils.js"
 import { storeSoundTableId } from "../constants.js"
 import { apiErrors } from "../errors.js"
@@ -72,7 +77,7 @@ export async function retrieveSound(
 
 		return {
 			caching:
-				context.user == null || sound.userId != BigInt(context.user.id),
+				context.user == null || sound.userId != BigInt(context.user.Id),
 			data: {
 				...sound,
 				audioFileUrl:
@@ -106,7 +111,7 @@ export async function listSounds(
 	let mine = args.mine && context.user != null
 
 	if (mine || args.userId) {
-		let where = { userId: context.user.id }
+		let where = { userId: context.user.Id }
 
 		if (args.userId) {
 			where.userId = args.userId
@@ -379,7 +384,7 @@ export async function createSound(
 	let sound = await context.prisma.sound.create({
 		data: {
 			uuid,
-			userId: user.id,
+			userId: user.Id,
 			name: args.name,
 			description: args.description,
 			tags: tagsData
@@ -435,7 +440,7 @@ export async function updateSound(
 	}
 
 	// Check if the sound belongs to the user
-	if (sound.userId != BigInt(user.id)) {
+	if (sound.userId != BigInt(user.Id)) {
 		throwApiError(apiErrors.actionNotAllowed)
 	}
 
@@ -537,7 +542,7 @@ export async function deleteSound(
 	}
 
 	// Check if the sound belongs to the user
-	if (sound.userId != BigInt(user.id)) {
+	if (sound.userId != BigInt(user.Id)) {
 		throwApiError(apiErrors.actionNotAllowed)
 	}
 
@@ -577,12 +582,28 @@ export async function user(
 	}
 
 	// Get the user from the API
-	let response = await getUserById(Number(sound.userId))
+	let response = await UsersController.retrieveUserById(
+		`
+			id
+			firstName
+			profileImage {
+				url
+			}
+		`,
+		{
+			auth: new Auth({
+				apiKey: process.env.DAV_API_KEY,
+				secretKey: process.env.DAV_SECRET_KEY,
+				uuid: process.env.DAV_UUID
+			}),
+			id: Number(sound.userId)
+		}
+	)
 
-	if (isSuccessStatusCode(response.status)) {
+	if (!Array.isArray(response)) {
 		return {
 			caching: true,
-			data: response.data
+			data: convertDavUserToUser(response)
 		}
 	}
 

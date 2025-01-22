@@ -7,11 +7,9 @@ import http from "http"
 import cors from "cors"
 import { PrismaClient } from "@prisma/client"
 import { createClient } from "redis"
-import { Dav, Environment, isSuccessStatusCode } from "dav-js"
-import { User } from "./src/types.js"
+import { Dav, User, Environment, UsersController } from "dav-js"
 import { throwApiError } from "./src/utils.js"
 import { apiErrors } from "./src/errors.js"
-import { getUser } from "./src/services/apiService.js"
 import { typeDefs } from "./src/typeDefs.js"
 import { resolvers } from "./src/resolvers.js"
 import { setup as webhookSetup } from "./src/endpoints/webhooks.js"
@@ -76,15 +74,22 @@ app.use(
 			let user: User = null
 
 			if (accessToken != null) {
-				let userResponse = await getUser(accessToken)
+				let userResponse = await UsersController.retrieveUser(
+					`
+						id
+						firstName
+						profileImage {
+							url
+						}
+					`,
+					{
+						accessToken
+					}
+				)
 
-				if (isSuccessStatusCode(userResponse.status)) {
-					user = userResponse.data
-				} else if (
-					userResponse.errors != null &&
-					userResponse.errors.length > 0 &&
-					userResponse.errors[0].code == 3101
-				) {
+				if (!Array.isArray(userResponse)) {
+					user = userResponse
+				} else if (userResponse.includes("SESSION_EXPIRED")) {
 					throwApiError(apiErrors.sessionExpired)
 				}
 			}

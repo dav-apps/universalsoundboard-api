@@ -1,11 +1,10 @@
 import { Express, Request, Response, raw } from "express"
 import cors from "cors"
 import * as mm from "music-metadata"
-import { TableObjectsController } from "dav-js"
+import { User, UsersController, TableObjectsController } from "dav-js"
 import {
 	handleEndpointError,
 	throwEndpointError,
-	getUserForEndpoint,
 	getFileExtensionByContentType
 } from "../utils.js"
 import { apiErrors } from "../errors.js"
@@ -16,11 +15,27 @@ export async function uploadSoundFile(req: Request, res: Response) {
 	try {
 		const uuid = req.params.uuid
 		const accessToken = req.headers.authorization
-		const user = await getUserForEndpoint(accessToken)
+		const retrieveUserResponse = await UsersController.retrieveUser(
+			`
+				id
+				firstName
+				profileImage {
+					url
+				}
+			`,
+			{ accessToken }
+		)
 
-		if (user == null) {
+		if (
+			Array.isArray(retrieveUserResponse) &&
+			retrieveUserResponse.includes("SESSION_EXPIRED")
+		) {
+			throwEndpointError(apiErrors.sessionExpired)
+		} else if (retrieveUserResponse == null) {
 			throwEndpointError(apiErrors.notAuthenticated)
 		}
+
+		const user = retrieveUserResponse as User
 
 		// Check if content type is supported
 		const contentType = req.headers["content-type"]
@@ -34,7 +49,7 @@ export async function uploadSoundFile(req: Request, res: Response) {
 		}
 
 		// Check if the sound belongs to the user
-		if (sound.userId != BigInt(user.id)) {
+		if (sound.userId != BigInt(user.Id)) {
 			throwEndpointError(apiErrors.actionNotAllowed)
 		}
 

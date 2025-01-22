@@ -1,93 +1,5 @@
 import axios from "axios"
-import { UserApiResponse, TableObjectPrice } from "../types.js"
-import {
-	apiBaseUrlDevelopment,
-	apiBaseUrlStaging,
-	apiBaseUrlProduction
-} from "../constants.js"
-
-function getApiBaseUrl() {
-	switch (process.env.ENVIRONMENT) {
-		case "staging":
-			return apiBaseUrlStaging
-		case "production":
-			return apiBaseUrlProduction
-		default:
-			return apiBaseUrlDevelopment
-	}
-}
-
-export async function getUser(accessToken: string): Promise<UserApiResponse> {
-	if (accessToken == null) {
-		return null
-	}
-
-	try {
-		let response = await axios({
-			method: "get",
-			url: `${getApiBaseUrl()}/v1/user`,
-			headers: {
-				Authorization: accessToken
-			}
-		})
-
-		return {
-			status: response.status,
-			data: {
-				id: response.data.id,
-				email: response.data.email,
-				firstName: response.data.first_name,
-				confirmed: response.data.confirmed,
-				totalStorage: response.data.total_storage,
-				usedStorage: response.data.used_storage,
-				plan: response.data.plan,
-				dev: response.data.dev,
-				provider: response.data.provider,
-				profileImage: response.data.profile_image,
-				profileImageEtag: response.data.profile_image_etag
-			}
-		}
-	} catch (error) {
-		return {
-			status: error.response?.status || 500,
-			errors: error.response?.data?.errors
-		}
-	}
-}
-
-export async function getUserById(id: number): Promise<UserApiResponse> {
-	try {
-		let response = await axios({
-			method: "get",
-			url: `${getApiBaseUrl()}/v1/user/${id}`,
-			headers: {
-				Authorization: process.env.DAV_AUTH
-			}
-		})
-
-		return {
-			status: response.status,
-			data: {
-				id: response.data.id,
-				email: response.data.email,
-				firstName: response.data.first_name,
-				confirmed: response.data.confirmed,
-				totalStorage: response.data.total_storage,
-				usedStorage: response.data.used_storage,
-				plan: response.data.plan,
-				dev: response.data.dev,
-				provider: response.data.provider,
-				profileImage: response.data.profile_image,
-				profileImageEtag: response.data.profile_image_etag
-			}
-		}
-	} catch (error) {
-		return {
-			status: error.response?.status || 500,
-			errors: error.response?.data?.errors
-		}
-	}
-}
+import { TableObjectPrice } from "../types.js"
 
 export async function setTableObjectPrice(params: {
 	uuid: string
@@ -97,7 +9,7 @@ export async function setTableObjectPrice(params: {
 	try {
 		let response = await axios({
 			method: "put",
-			url: `${getApiBaseUrl()}/v2/table_objects/${params.uuid}/price`,
+			url: `bla/v2/table_objects/${params.uuid}/price`,
 			headers: {
 				Authorization: process.env.DAV_AUTH,
 				"Content-Type": "application/json"

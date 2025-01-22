@@ -1,9 +1,8 @@
 import { Response } from "express"
 import { GraphQLError } from "graphql"
-import { isSuccessStatusCode } from "dav-js"
+import { User as DavUser } from "dav-js"
 import { ApiError, User } from "./types.js"
 import { apiErrors } from "./errors.js"
-import { getUser } from "./services/apiService.js"
 
 export function throwApiError(error: ApiError) {
 	throw new GraphQLError(error.message, {
@@ -53,32 +52,12 @@ function sendEndpointError(res: Response, error: ApiError) {
 	})
 }
 
-export async function getUserForEndpoint(accessToken: string): Promise<User> {
-	if (accessToken == null) {
-		return null
-	}
-
-	let userResponse = await getUser(accessToken)
-
-	if (isSuccessStatusCode(userResponse.status)) {
-		return userResponse.data
-	} else if (
-		userResponse.errors != null &&
-		userResponse.errors.length > 0 &&
-		userResponse.errors[0].code == 3101
-	) {
-		throwEndpointError(apiErrors.sessionExpired)
-	}
-
-	return null
-}
-
 export async function generateUuidForFreesoundItem(id: number) {
 	return `freesound:${id}`
 }
 
 export function getTableObjectFileUrl(uuid: string) {
-	return `https://dav-backend.fra1.cdn.digitaloceanspaces.com/${uuid}`
+	return `https://dav-backend-dev.fra1.cdn.digitaloceanspaces.com/${uuid}`
 }
 
 export function randomNumber(min: number, max: number) {
@@ -97,5 +76,13 @@ export function getFileExtensionByContentType(contentType: string): string {
 			return "ogg"
 		default:
 			return null
+	}
+}
+
+export function convertDavUserToUser(davUser: DavUser): User {
+	return {
+		id: davUser.Id,
+		firstName: davUser.FirstName,
+		profileImage: davUser.ProfileImage
 	}
 }
