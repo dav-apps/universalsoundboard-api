@@ -40,7 +40,7 @@ export function validateDescriptionLength(description: string) {
 }
 
 export function validateCurrency(currency: string) {
-	if (!["eur", "usd"].includes(currency)) {
+	if (!["EUR", "USD"].includes(currency.toUpperCase())) {
 		return validationErrors.currencyInvalid
 	}
 }

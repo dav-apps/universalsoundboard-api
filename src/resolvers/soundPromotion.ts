@@ -4,9 +4,8 @@ import { SoundPromotion } from "@prisma/client"
 import {
 	CheckoutSessionsController,
 	TableObjectsController,
-	isSuccessStatusCode,
-	ApiResponse,
-	CreateCheckoutSessionResponseData
+	CheckoutSessionResource,
+	TableObjectPriceType
 } from "dav-js"
 import { setTableObjectPrice } from "../services/apiService.js"
 import { validateCurrency } from "../services/validationService.js"
@@ -20,7 +19,7 @@ export async function createSoundPromotion(
 	context: ResolverContext
 ): Promise<SoundPromotion> {
 	const user = context.user
-	const currency = args.currency ?? "eur"
+	const currency = args.currency ?? "EUR"
 	const price = 150
 
 	// Check if the user is logged in
@@ -44,13 +43,13 @@ export async function createSoundPromotion(
 	let uuid = crypto.randomUUID()
 
 	let createTableObjectResponse =
-		await TableObjectsController.CreateTableObject({
+		await TableObjectsController.createTableObject(`uuid`, {
 			accessToken: context.accessToken,
 			uuid,
 			tableId: 40
 		})
 
-	if (!isSuccessStatusCode(createTableObjectResponse.status)) {
+	if (Array.isArray(createTableObjectResponse)) {
 		throwApiError(apiErrors.unexpectedError)
 	}
 
@@ -62,11 +61,11 @@ export async function createSoundPromotion(
 	})
 
 	let createCheckoutSessionResponse =
-		await CheckoutSessionsController.CreateCheckoutSession({
+		await CheckoutSessionsController.createPaymentCheckoutSession(`url`, {
 			accessToken: context.accessToken,
-			mode: "payment",
+			type: TableObjectPriceType.Purchase,
 			currency,
-			tableObjects: [uuid],
+			tableObjectUuid: uuid,
 			successUrl:
 				"https://universalsoundboard.dav-apps.tech/sound-promotion?success=true",
 			cancelUrl: "https://universalsoundboard.dav-apps.tech/sound-promotion",
@@ -75,15 +74,12 @@ export async function createSoundPromotion(
 				"https://dav-backend.fra1.cdn.digitaloceanspaces.com/misc/sound-promotion.jpg"
 		})
 
-	if (!isSuccessStatusCode(createCheckoutSessionResponse.status)) {
+	if (Array.isArray(createCheckoutSessionResponse)) {
 		throwApiError(apiErrors.unexpectedError)
 	}
 
-	let createCheckoutSessionResponseData = (
-		createCheckoutSessionResponse as ApiResponse<CreateCheckoutSessionResponseData>
-	).data
-
-	let sessionUrl = createCheckoutSessionResponseData.sessionUrl
+	let sessionUrl = (createCheckoutSessionResponse as CheckoutSessionResource)
+		.url
 
 	// Create the SoundPromotion
 	let now = DateTime.now()

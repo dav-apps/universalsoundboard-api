@@ -387,14 +387,17 @@ export async function createSound(
 	})
 
 	// Create the sound table object
-	let createSoundResponse = await TableObjectsController.CreateTableObject({
-		accessToken: context.accessToken,
-		uuid,
-		tableId: storeSoundTableId,
-		file: true
-	})
+	let createSoundResponse = await TableObjectsController.createTableObject(
+		`uuid`,
+		{
+			accessToken: context.accessToken,
+			uuid,
+			tableId: storeSoundTableId,
+			file: true
+		}
+	)
 
-	if (!isSuccessStatusCode(createSoundResponse.status)) {
+	if (Array.isArray(createSoundResponse)) {
 		throwApiError(apiErrors.unexpectedError)
 	}
 
@@ -544,8 +547,8 @@ export async function deleteSound(
 		tags.push(tag.name)
 	}
 
-	// Delete the sound on the dav backend
-	await TableObjectsController.DeleteTableObject({
+	// Delete the sound table object
+	await TableObjectsController.deleteTableObject(`uuid`, {
 		accessToken: context.accessToken,
 		uuid: args.uuid
 	})

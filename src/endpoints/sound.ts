@@ -1,7 +1,7 @@
 import { Express, Request, Response, raw } from "express"
 import cors from "cors"
 import * as mm from "music-metadata"
-import { TableObjectsController, isSuccessStatusCode } from "dav-js"
+import { TableObjectsController } from "dav-js"
 import {
 	handleEndpointError,
 	throwEndpointError,
@@ -39,15 +39,15 @@ export async function uploadSoundFile(req: Request, res: Response) {
 		}
 
 		// Upload the file
-		let setTableObjectFileResponse =
-			await TableObjectsController.SetTableObjectFile({
+		let uploadTableObjectFileResponse =
+			await TableObjectsController.uploadTableObjectFile({
 				accessToken,
 				uuid: sound.uuid,
-				data: req.body,
-				type: contentType
+				contentType,
+				data: req.body
 			})
 
-		if (!isSuccessStatusCode(setTableObjectFileResponse.status)) {
+		if (Array.isArray(uploadTableObjectFileResponse)) {
 			throwEndpointError(apiErrors.unexpectedError)
 		}
 
