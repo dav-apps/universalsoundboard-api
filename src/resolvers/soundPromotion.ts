@@ -4,10 +4,11 @@ import { SoundPromotion } from "@prisma/client"
 import {
 	CheckoutSessionsController,
 	TableObjectsController,
+	TableObjectPricesController,
 	CheckoutSessionResource,
-	TableObjectPriceType
+	TableObjectPriceType,
+	Auth
 } from "dav-js"
-import { setTableObjectPrice } from "../services/apiService.js"
 import { validateCurrency } from "../services/validationService.js"
 import { ResolverContext, Currency } from "../types.js"
 import { throwApiError, throwValidationError } from "../utils.js"
@@ -54,10 +55,16 @@ export async function createSoundPromotion(
 	}
 
 	// Set the price of the table object
-	await setTableObjectPrice({
-		uuid,
+	await TableObjectPricesController.setTableObjectPrice(`price`, {
+		auth: new Auth({
+			apiKey: process.env.DAV_API_KEY,
+			secretKey: process.env.DAV_SECRET_KEY,
+			uuid: process.env.DAV_UUID
+		}),
+		tableObjectUuid: uuid,
 		price,
-		currency
+		currency,
+		type: TableObjectPriceType.Purchase
 	})
 
 	let createCheckoutSessionResponse =
