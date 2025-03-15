@@ -3,9 +3,9 @@ import { Prisma, PrismaClient, SoundPromotion, Tag } from "@prisma/client"
 import { DateTime } from "luxon"
 import {
 	Auth,
-	User as DavUser,
 	TableObjectsController,
-	UsersController
+	UsersController,
+	convertUserResourceToUser
 } from "dav-js"
 import { getSound, searchSounds } from "../services/freesoundApiService.js"
 import { ResolverContext, QueryResult, List, User, Sound } from "../types.js"
@@ -603,7 +603,7 @@ export async function user(
 	if (!Array.isArray(response)) {
 		return {
 			caching: true,
-			data: convertDavUserToUser(response)
+			data: convertDavUserToUser(convertUserResourceToUser(response))
 		}
 	}
 

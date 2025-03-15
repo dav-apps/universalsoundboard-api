@@ -1,4 +1,4 @@
-import { Auth, UsersController } from "dav-js"
+import { Auth, UsersController, convertUserResourceToUser } from "dav-js"
 import { convertDavUserToUser } from "../utils.js"
 import { ResolverContext, QueryResult, User } from "../types.js"
 
@@ -37,7 +37,7 @@ export async function retrieveUser(
 	if (!Array.isArray(response)) {
 		return {
 			caching: true,
-			data: convertDavUserToUser(response)
+			data: convertDavUserToUser(convertUserResourceToUser(response))
 		}
 	}
 

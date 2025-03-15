@@ -7,7 +7,13 @@ import http from "http"
 import cors from "cors"
 import { PrismaClient } from "@prisma/client"
 import { createClient } from "redis"
-import { Dav, User, Environment, UsersController } from "dav-js"
+import {
+	Dav,
+	User,
+	Environment,
+	UsersController,
+	convertUserResourceToUser
+} from "dav-js"
 import { throwApiError } from "./src/utils.js"
 import { apiErrors } from "./src/errors.js"
 import { typeDefs } from "./src/typeDefs.js"
@@ -88,7 +94,7 @@ app.use(
 				)
 
 				if (!Array.isArray(userResponse)) {
-					user = userResponse
+					user = convertUserResourceToUser(userResponse)
 				} else if (userResponse.includes("SESSION_EXPIRED")) {
 					throwApiError(apiErrors.sessionExpired)
 				}

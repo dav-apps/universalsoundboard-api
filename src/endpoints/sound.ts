@@ -1,7 +1,7 @@
 import { Express, Request, Response, raw } from "express"
 import cors from "cors"
 import * as mm from "music-metadata"
-import { User, UsersController, TableObjectsController } from "dav-js"
+import { UsersController, TableObjectsController, UserResource } from "dav-js"
 import {
 	handleEndpointError,
 	throwEndpointError,
@@ -35,7 +35,7 @@ export async function uploadSoundFile(req: Request, res: Response) {
 			throwEndpointError(apiErrors.notAuthenticated)
 		}
 
-		const user = retrieveUserResponse as User
+		const user = retrieveUserResponse as UserResource
 
 		// Check if content type is supported
 		const contentType = req.headers["content-type"]
@@ -49,7 +49,7 @@ export async function uploadSoundFile(req: Request, res: Response) {
 		}
 
 		// Check if the sound belongs to the user
-		if (sound.userId != BigInt(user.Id)) {
+		if (sound.userId != BigInt(user.id)) {
 			throwEndpointError(apiErrors.actionNotAllowed)
 		}
 
